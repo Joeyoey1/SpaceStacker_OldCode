@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.Map;
 
 public class Place implements Listener {
 
@@ -184,7 +185,22 @@ public class Place implements Listener {
 
                 }.runTaskLater(SpaceStacker.instance, 1);
             }
-        } else {
+        } else if (e.getBlock().getType().equals(Material.WATER)) {
+            ItemStack inHand = e.getItemInHand();
+            if (inHand.getType().equals(Material.BUCKET) || inHand.getType().equals(Material.WATER_BUCKET)) {
+                int amount = inHand.getAmount();
+                if (amount > 1) {
+                    ItemStack newBucket = new ItemStack(Material.WATER_BUCKET, amount - 1);
+                    ItemStack emptyBucket = new ItemStack(Material.BUCKET, 1);
+                    e.getPlayer().getInventory().setItemInMainHand(newBucket);
+                    Map<Integer, ItemStack> extra = e.getPlayer().getInventory().addItem(emptyBucket);
+                    if (!extra.isEmpty()) {
+                        for (Map.Entry<Integer, ItemStack> ex : extra.entrySet()) {
+                            e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), ex.getValue());
+                        }
+                    }
+                }
+            }
             return;
         }
     }

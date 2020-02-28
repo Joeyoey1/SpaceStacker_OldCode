@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
@@ -78,7 +79,7 @@ public class StackedItem {
 			return false;
 		}
 		if (!this.getId().equals(a.getId())) {
-			if (this.getItem().getItemStack().isSimilar(a.getItem().getItemStack())) {
+			if (this.getItem().getItemStack().isSimilar(a.getItem().getItemStack()) && !isNonStacable(this.getItem().getItemStack())) {
 				if (this.getItem().getLocation().getWorld().equals(a.getItem().getLocation().getWorld())) {
 					if (this.getItem().getLocation().distanceSquared(a.getItem().getLocation()) < SpaceStacker.mergeDist) {
 						return a.getItem().isValid() && this.getItem().isValid();
@@ -94,6 +95,25 @@ public class StackedItem {
 		} else {
 			return false;
 		}
+	}
+
+	private final boolean isNonStacable(final ItemStack itemStack) {
+		if (itemStack == null)
+			return false;
+		final String typeNameString = itemStack.getType().name();
+		if (typeNameString.endsWith("_HELMET")
+				|| typeNameString.endsWith("_CHESTPLATE")
+				|| typeNameString.endsWith("_LEGGINGS")
+				|| typeNameString.endsWith("_BOOTS")
+				|| typeNameString.endsWith("SWORD")
+				|| typeNameString.endsWith("PICKAXE")
+				|| typeNameString.endsWith("SHOVEL")
+				|| typeNameString.endsWith("HOE")
+				) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean tryStack(StackedItem a) {

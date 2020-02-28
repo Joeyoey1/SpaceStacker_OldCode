@@ -1,0 +1,120 @@
+#################################
+##        #############        ##
+##        #############        ##
+##        #############        ##
+##        #############        ##
+#################################
+#################################
+#################################
+##########             ##########
+####                         ####
+####                         ####
+####      #############      ####
+####      #############      ####
+####      #############      ####
+####      #############      ####
+#################################
+#################################
+# SpaceStacker by Joeyoey <3
+settings:
+  debug: false
+  inv-name: '&b%entity% Upgrade Spawner'
+  inv-size: 27 # must be multiple of 9 up to a maximum of 54
+  filler-material: STAINED_GLASS_PANE
+  filler-data: 0 # this can allow you to choose the color of glass and stuff like that.
+  filler-name: ' ' # recommend it staying empty
+  color-for-upgrade-text: '&b'
+  upgrade-lore:
+  - ''
+  - 'Cost: %cost%'
+  - '%costP%'
+  already-upgraded:
+  - ''
+  - 'This is already upgraded.'
+  - ''
+  savefrequency: 3000 # in ticks
+  holo-view-dist: 20 # requires protocolLib
+  merge-distance: 10
+  # Damage Causes required for the entire stack to die... can be found here https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+  stack-kill:
+  - 'FALL'
+  - 'LAVA'
+  - 'ENTITY_ATTACK'
+  max-spawner-stack: 10000
+  max-item-stack: 10000
+  max-entity-stack: 10000 # There is a hard cap at 10,000 as drop calculation is rough past that... This will be fixed in the future.
+  
+  itemstack-mode: false # This enables a mode of which upgrades will be gotten as an itemstack which includes lore name and data, if this is enabled and any of those are missing the plugin will shutdown.
+  
+  nerf-mobs: true
+  
+  stack-reasons: # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html detailed list of spawn reasons
+  - NATURAL
+  - CUSTOM
+  
+entities: # You can add any and all entities as long as their name matches spigots Entity names. Just follow the below format.
+  zombie:
+    gold_ingot:
+      cost: 100
+      slot: 11
+      #name: # This is the gui name when the spawner is clicked for upgrades
+      #gui-lore: # this is the replacement lore if you dont wish to use the general formatting above.
+      #-
+      #-
+      #-
+      #item-name: #this is the name of the item that drops when the plugin is in item stack mode
+      #lore: # this is the lore of the item that drops when in itemstack mode
+      #-
+      #-
+      #-
+    diamond:
+      cost: 150
+      slot: 13
+    emerald:
+      cost: 200
+      slot: 15
+      
+      
+      
+formats:
+  # Format for the spawner item in the inventory of the player.
+  tier-spawner:
+    name: '%entity% spawner'
+    lore: # Amount and Upgrade is NECCESARY otherwise plugin will assume only one spawner is placed or a null upgrade is placed.
+    - ' '
+    - 'Upgrade: %upgrade%'
+    - 'Amount: %amount%'
+    - 'Entity: %entity%%'
+    - ' '
+  
+  # To any of these formats you can add or remove Color, placeholders and all the sorts.
+  #
+  # Name above the entity. Placeholders: %amt%, %mobType%, %drop%
+  entity-name-format: '%amt%x &b%mobType% &7&o(( %drop% ))'          # None of these placeholders are required so you can remove them if you wish.
+  
+  # Name above the items on the ground. Placeholders: %amt%, %matType%
+  item-name-format: '%amt%x &b%matType%'                             # None of these placeholders are required so you can remove them if you wish.
+  
+  # Name above the spawners. Placeholders: %amt%, %mobType%, %drop%
+  spawner-name-format: '%amt%x &b%mobType% Spawner &7&o(( %drop% ))' # None of these placeholders are required so you can remove them if you wish. 
+  
+  # This is to enable/disable the floating item above the spawner showing the upgrade tier.
+  hover-upgrade-drop: true
+
+    
+messages:
+  # Sent to the player when they dont have a silk touch pick or they dont have the required permissions to mine the spawner.
+  no-silk: 'You dont have permission to keep broken spawners, you can get that permission here URL here' # Can use color codes for all text in the message area.
+  
+  # This message is sent to the player when they purchase an upgrade in the upgrade menu.
+  purchase-success: 'You have successfully purchased %upgrade%'
+  
+  # This message is sent to players when their purchase fails ( most often due to no money )
+  purchase-fail: 'You dont have the funds to do that.'
+  
+  # This gives a message so the time to open the menu ( usually very fast async ) doesnt seem too long.
+  load: 'The menu is currently loading...'
+  
+  
+  # Message sent to player when they try to repurchase an upgrade.
+  already-upgraded: '&cYou have already gotten this upgrade...'

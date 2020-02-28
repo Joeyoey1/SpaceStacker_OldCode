@@ -1,0 +1,12 @@
+name: SpaceStacker
+author: Joeyoey
+version: ${project.version}
+main: com.joeyoey.spacestacker.SpaceStacker
+description: Spawner stacking plugin with spawner upgrades.
+load: POSTWORLD
+softdepend: [HolographicDisplays,Vault]
+loadbefore: [ShopGUIPlus]
+
+commands:
+  spacespawners:
+    aliases: [sspawners, sspawner]

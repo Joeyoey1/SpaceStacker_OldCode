@@ -144,7 +144,7 @@ public class SpaceStacker extends JavaPlugin {
                 try {
                     for (Iterator<StackedItem> item = listOfItems.values().iterator(); item.hasNext(); ) {
                         StackedItem stackedItem = item.next();
-                        if ((System.currentTimeMillis() - stackedItem.getCreation()) > 60000) {
+                        if ((System.currentTimeMillis() - stackedItem.getCreation()) > 60000 || stackedItem.getItem().getLocation().getY() < 0) {
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
@@ -231,33 +231,11 @@ public class SpaceStacker extends JavaPlugin {
         }.runTaskLater(this, 20);
 
         new BukkitRunnable() {
-
             @Override
             public void run() {
-                List<UUID> toRemove = new ArrayList<>();
-                for (StackedItem sI : listOfItems.values()) {
-                    try {
-                        Item item = sI.getItem();
-                        if (item == null) {
-                            toRemove.add(sI.getId());
-                        } else if (item.getLocation().getY() < 0) {
-                            toRemove.add(sI.getId());
-                        }
-                    } catch (NullPointerException e) {
-                        toRemove.add(sI.getId());
-                    }
-                }
-                for (UUID ids : toRemove) {
-                    listOfItems.remove(ids);
-                }
-                if (times % 50 == 0) {
-                    check();
-                    times = 0;
-                } else {
-                    times++;
-                }
+                check();
             }
-        }.runTaskTimer(this, 0, 100);
+        }.runTaskTimer(this, 0, 10000);
     }
 
     public void loadSettings() {

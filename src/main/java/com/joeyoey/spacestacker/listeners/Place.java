@@ -61,14 +61,16 @@ public class Place implements Listener {
             if (e.getPlayer().getItemInHand().hasItemMeta()) {
                 if (e.getPlayer().getItemInHand().getItemMeta().hasLore()) {
                     String pt1 = ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a].toUpperCase());
+                    String itemDisplayName = e.getPlayer().getItemInHand().getItemMeta().getDisplayName();
                     try {
                         if (ChatColor
                                 .stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1])
                                 .equalsIgnoreCase("golem")
-                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("zombie")
-                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("skeleton")
-                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("spider")
-                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("cow")) {
+                                || ChatColor.stripColor(itemDisplayName.split(" ")[a + 1]).equalsIgnoreCase("zombie")
+                                || ChatColor.stripColor(itemDisplayName.split(" ")[a + 1]).equalsIgnoreCase("skeleton")
+                                || ChatColor.stripColor(itemDisplayName.split(" ")[a + 1]).equalsIgnoreCase("spider")
+                                || ChatColor.stripColor(itemDisplayName.split(" ")[a + 1]).equalsIgnoreCase("cow")
+                                || ChatColor.stripColor(itemDisplayName.split(" ")[a + 1]).equalsIgnoreCase("cube")) {
                             pt1 += "_" + ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1].toUpperCase());
                         }
                     } catch (IndexOutOfBoundsException extra) {

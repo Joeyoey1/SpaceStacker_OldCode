@@ -65,7 +65,10 @@ public class Place implements Listener {
                         if (ChatColor
                                 .stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1])
                                 .equalsIgnoreCase("golem")
-                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("zombie") || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("skeleton") || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("spider")) {
+                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("zombie")
+                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("skeleton")
+                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("spider")
+                                || ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1]).equalsIgnoreCase("cow")) {
                             pt1 += "_" + ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().split(" ")[a + 1].toUpperCase());
                         }
                     } catch (IndexOutOfBoundsException extra) {

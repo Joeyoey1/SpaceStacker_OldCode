@@ -156,20 +156,20 @@ public class ItemDrop implements Listener {
     }
 
     @EventHandler
-    public void onDrop(ItemSpawnEvent e) {
-        Item item = e.getEntity();
+    public void onDrop(ItemSpawnEvent event) {
+        Item item = event.getEntity();
         UUID id = item.getUniqueId();
-        ItemStack is = item.getItemStack();
-        Material mat = is.getType();
-        int stackAmt = is.getAmount();
+        ItemStack itemStack = item.getItemStack();
+        Material material = itemStack.getType();
+        int stackAmount = itemStack.getAmount();
 
         if (SpaceStacker.instance.getListOfItems().size() > 5000) {
             if (SpaceStacker.instance.getListOfItems().size() > 5000) {
                 SpaceStacker.instance.getListOfItems().values().removeIf(next -> !next.getItem().isValid());
             }
-            e.setCancelled(true);
+            event.setCancelled(true);
         } else {
-            StackedItem sI = new StackedItem(mat, stackAmt, item, id, System.currentTimeMillis());
+            StackedItem sI = new StackedItem(material, stackAmount, item, id, System.currentTimeMillis());
             SpaceStacker.instance.getListOfItems().put(id, sI);
         }
         //tryAll(sI);

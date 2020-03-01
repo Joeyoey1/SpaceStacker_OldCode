@@ -29,6 +29,7 @@ public class StackedSpawner implements Serializable {
 	private JoLocation jLoc;
 	private Hologram holo;
 	private ItemStack item;
+	private boolean spawnable;
 
 	/**
 	 * This is used to create a stacked spawner
@@ -36,7 +37,6 @@ public class StackedSpawner implements Serializable {
 	 * This cannot be used ASYNC
 	 * 
 	 * @param stackAmount
-	 * @param entity
 	 * @param jLoc
 	 */
 	@SuppressWarnings("deprecation")
@@ -48,6 +48,7 @@ public class StackedSpawner implements Serializable {
 		this.jLoc = jLoc;
 		this.chunkX = jLoc.getBlock().getChunk().getX();
 		this.chunkZ = jLoc.getBlock().getChunk().getZ();
+		this.spawnable = false;
 
 		holo = HologramsAPI.createHologram(SpaceStacker.instance, jLoc.getBlock().add(0.5, 2.0, 0.5));
 		holo.appendTextLine(ChatColor.translateAlternateColorCodes('&', SpaceStacker.instance.getSpawnerFormat()
@@ -64,7 +65,6 @@ public class StackedSpawner implements Serializable {
 	 * 
 	 * This cannot be used ASYNC
 	 * 
-	 * @param entity
 	 * @param jLoc
 	 */
 	@SuppressWarnings("deprecation")
@@ -76,6 +76,8 @@ public class StackedSpawner implements Serializable {
 		this.jLoc = jLoc;
 		this.chunkX = jLoc.getBlock().getChunk().getX();
 		this.chunkZ = jLoc.getBlock().getChunk().getZ();
+		this.spawnable = false;
+
 
 		holo = HologramsAPI.createHologram(SpaceStacker.instance, jLoc.getBlock().add(0.5, 2.0, 0.5));
 		holo.appendTextLine(ChatColor.translateAlternateColorCodes('&', SpaceStacker.instance.getSpawnerFormat()
@@ -93,7 +95,6 @@ public class StackedSpawner implements Serializable {
 	 * 
 	 * This cannot be used ASYNC
 	 * 
-	 * @param entity
 	 * @param jLoc
 	 */
 	@SuppressWarnings("deprecation")
@@ -105,6 +106,8 @@ public class StackedSpawner implements Serializable {
 		this.jLoc = jLoc;
 		this.chunkX = jLoc.getBlock().getChunk().getX();
 		this.chunkZ = jLoc.getBlock().getChunk().getZ();
+		this.spawnable = false;
+
 
 		holo = HologramsAPI.createHologram(SpaceStacker.instance, jLoc.getBlock().add(0.5, 2.0, 0.5));
 		holo.appendTextLine(ChatColor.translateAlternateColorCodes('&', SpaceStacker.instance.getSpawnerFormat()
@@ -123,9 +126,7 @@ public class StackedSpawner implements Serializable {
 	 * This can be used ASYNC
 	 * 
 	 * @param chunkX
-	 * @param chunkY
 	 * @param stackAmount
-	 * @param entity
 	 * @param jLoc
 	 */
 	@SuppressWarnings("deprecation")
@@ -138,6 +139,8 @@ public class StackedSpawner implements Serializable {
 		this.mat = mat;
 		this.item = new ItemStack(mat);
 		this.jLoc = jLoc;
+		this.spawnable = false;
+
 
 		holo = HologramsAPI.createHologram(SpaceStacker.instance, jLoc.getBlock().add(0.5, 2.0, 0.5));
 		holo.appendTextLine(ChatColor.translateAlternateColorCodes('&', SpaceStacker.instance.getSpawnerFormat()
@@ -192,6 +195,11 @@ public class StackedSpawner implements Serializable {
 
 	public Hologram getHolo() {
 		return holo;
+	}
+
+	public boolean isSpawnable() {
+		this.spawnable = !this.spawnable;
+		return this.spawnable;
 	}
 
 	public void createHolo() {

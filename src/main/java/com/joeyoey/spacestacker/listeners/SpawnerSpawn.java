@@ -21,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SpawnerSpawn implements Listener {
 
@@ -32,6 +33,10 @@ public class SpawnerSpawn implements Listener {
 			JoLocation jLoc = new JoLocation(e.getSpawner().getLocation());
 			if (SpaceStacker.instance.getStackedSpawners().containsKey(jLoc)) {
 				StackedSpawner ss = SpaceStacker.instance.getStackedSpawners().get(jLoc);
+				if (!ss.isSpawnable()) {
+                    e.setCancelled(true);
+                    return;
+                }
 					ItemStack item = ss.getItemStack();
 					UUID id = e.getEntity().getUniqueId();
 					int stackAmt = ss.getStackAmount();
@@ -393,18 +398,16 @@ public class SpawnerSpawn implements Listener {
 
 	public int sumEntity(int stackAMT) {
 		int sum = 0;
-		Random rand = new Random();
 		for (int i = 0; i < stackAMT; i++) {
-			sum += rand.nextInt(2) + 1;
+			sum += ThreadLocalRandom.current().nextInt(1) + 1;
 		}
 		return sum;
 	}
 
 	public int sumItems(int stackAMT, int multi) {
 		int sum = 0;
-		Random rand = new Random();
 		for (int i = 0; i < stackAMT; i++) {
-			sum += rand.nextInt(1) + 1 + multi;
+			sum += ThreadLocalRandom.current().nextInt(1) + 1 + multi;
 		}
 		return sum;
 	}

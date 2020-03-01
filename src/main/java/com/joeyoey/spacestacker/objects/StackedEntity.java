@@ -18,6 +18,7 @@ public class StackedEntity {
 	private int stackAmount;
 	private UUID id;
 	private ItemStack item;
+	private long creationTime;
 
 	public StackedEntity(Entity baseEnt, Material matToDrop, UUID id) {
 		this.baseEnt = baseEnt;
@@ -25,6 +26,7 @@ public class StackedEntity {
 		this.item = new ItemStack(matToDrop);
 		this.stackAmount = 1;
 		this.id = id;
+		this.creationTime = System.currentTimeMillis();
 	}
 
 	public StackedEntity(Entity baseEnt, Material matToDrop, int stackAmount, UUID id) {
@@ -33,6 +35,7 @@ public class StackedEntity {
 		this.item = new ItemStack(matToDrop);
 		this.stackAmount = stackAmount;
 		this.id = id;
+		this.creationTime = System.currentTimeMillis();
 	}
 
 	public StackedEntity(Entity baseEnt, ItemStack matToDrop, int stackAmount, UUID id) {
@@ -41,6 +44,7 @@ public class StackedEntity {
 		this.item = matToDrop;
 		this.stackAmount = stackAmount;
 		this.id = id;
+		this.creationTime = System.currentTimeMillis();
 	}
 	
 	public Entity getBaseEnt() {
@@ -104,6 +108,14 @@ public class StackedEntity {
 	public boolean canStackWith(StackedEntity a) {
 		if (this.getStackAmount() == SpaceStacker.instance.getMaxEntityStack()
 				|| a.getStackAmount() == SpaceStacker.instance.getMaxEntityStack() || a.getStackAmount() >= 10000 || this.getStackAmount() >= 10000) {
+			return false;
+		}
+		if (System.currentTimeMillis() - this.creationTime > 600000) {
+			SpaceStacker.instance.getTimedOutMobs().add(this);
+			return false;
+		}
+		if (System.currentTimeMillis() - a.creationTime > 600000) {
+			SpaceStacker.instance.getTimedOutMobs().add(a);
 			return false;
 		}
 		if (this.baseEnt.getLocation().getWorld().equals(a.getBaseEnt().getLocation().getWorld())) {

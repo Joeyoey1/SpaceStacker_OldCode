@@ -62,6 +62,7 @@ public class SpaceStacker extends JavaPlugin {
     private Set<SpawnReason> reasons = new HashSet<>();
     private BukkitTask itemTask;
     private int times;
+    private Set<StackedEntity> timedOutMobs = new HashSet<>();
 
 
     public void onEnable() {
@@ -302,6 +303,10 @@ public class SpaceStacker extends JavaPlugin {
             }
 
         }
+    }
+
+    public Set<StackedEntity> getTimedOutMobs() {
+        return timedOutMobs;
     }
 
     public Map<JoLocation, StackedSpawner> getStackedSpawners() {

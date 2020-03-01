@@ -105,6 +105,12 @@ public class SpawnerSpawn implements Listener {
 				}
 			}
 		}
+		for (StackedEntity stackedEntity : SpaceStacker.instance.getTimedOutMobs()) {
+			if (stackedEntity.getBaseEnt().isValid() && !stackedEntity.getBaseEnt().isDead()) {
+				SpaceStacker.instance.getListOfEnt().remove(stackedEntity.getId());
+				stackedEntity.getBaseEnt().remove();
+			}
+		}
 	} //
 
 	@EventHandler
@@ -294,6 +300,7 @@ public class SpawnerSpawn implements Listener {
 					} else {
 						Entity ent = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(),
 								sE.getBaseEnt().getType());
+						ent.setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
 						SpaceStacker.instance.getListOfEnt().put(ent.getUniqueId(),
 								new StackedEntity(ent, mat, sE.getStackAmount(), ent.getUniqueId()));
 						SpaceStacker.instance.getListOfEnt().get(ent.getUniqueId()).updateName();
@@ -340,6 +347,7 @@ public class SpawnerSpawn implements Listener {
 					} else {
 						Entity ent = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(),
 								sE.getBaseEnt().getType());
+						ent.setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
 						SpaceStacker.instance.getListOfEnt().put(ent.getUniqueId(),
 								new StackedEntity(ent, mat, sE.getStackAmount() - 1, ent.getUniqueId()));
 						SpaceStacker.instance.getListOfEnt().get(ent.getUniqueId()).updateName();

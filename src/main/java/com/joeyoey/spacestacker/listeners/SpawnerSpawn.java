@@ -99,14 +99,14 @@ public class SpawnerSpawn implements Listener {
 						aa.getBaseEnt().setCustomNameVisible(false);
 					} catch (NullPointerException ignored) {
 					}
-					return;
+					break;
 				} else if (!a.getBaseEnt().isValid()) {
 					SpaceStacker.instance.getListOfEnt().remove(a.getId());
 					try {
 						a.getBaseEnt().setCustomNameVisible(false);
 					} catch (NullPointerException ignored) {
 					}
-					return;
+					break;
 				}
 			}
 		}
@@ -116,6 +116,7 @@ public class SpawnerSpawn implements Listener {
 				stackedEntity.getBaseEnt().remove();
 			}
 		}
+		SpaceStacker.instance.getTimedOutMobs().clear();
 	} //
 
 	@EventHandler

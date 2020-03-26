@@ -1,7 +1,6 @@
 package com.joeyoey.spacestacker.listeners;
 
 import com.joeyoey.spacestacker.SpaceStacker;
-import com.joeyoey.spacestacker.objects.StackedItem;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

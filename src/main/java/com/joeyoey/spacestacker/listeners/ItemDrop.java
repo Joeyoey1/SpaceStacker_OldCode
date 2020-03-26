@@ -2,7 +2,6 @@ package com.joeyoey.spacestacker.listeners;
 
 import com.joeyoey.spacestacker.SpaceStacker;
 import com.joeyoey.spacestacker.objects.StackedItem;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -169,12 +168,9 @@ public class ItemDrop implements Listener {
             }
             event.setCancelled(true);
         } else {
-            StackedItem sI = new StackedItem(material, stackAmount, item, id, System.currentTimeMillis());
-            SpaceStacker.instance.getListOfItems().put(id, sI);
+            StackedItem stackedItem = new StackedItem(material, stackAmount, item, id, System.currentTimeMillis());
+            SpaceStacker.instance.getListOfItems().put(id, stackedItem);
         }
         //tryAll(sI);
     }
-
-
-
 }

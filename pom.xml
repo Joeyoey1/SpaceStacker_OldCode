@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.joeyoey</groupId>
-    <artifactId>SpaceStackerFix</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>SpaceStacker</artifactId>
+    <version>1.9.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>SpaceStackerFix</name>

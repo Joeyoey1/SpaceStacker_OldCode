@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("deprecation")
@@ -27,45 +28,73 @@ public class ItemDrop implements Listener {
     @EventHandler
     public void onPickUp(PlayerPickupItemEvent e) {
 //		if (e.getEntity() instanceof Player) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("a");
         Item item = e.getItem();
         UUID id = item.getUniqueId();
         if (SpaceStacker.instance.getListOfItems().containsKey(id)) {
+            stringBuilder.append("b");
             e.setCancelled(true);
-            StackedItem sI = SpaceStacker.instance.getListOfItems().get(id);
             item.getItemStack().setAmount(SpaceStacker.instance.getListOfItems().get(id).getStackAmount());
             boolean pickedUp = false;
-            for (int i = sI.getStackAmount(); i > 0; i -= 64) {
-                int x;
-                if (i > 64) {
-                    item.getItemStack().setAmount(64);
-                    x = 64;
-                } else {
-                    item.getItemStack().setAmount(i);
-                    x = i;
+
+            HashMap<Integer, ItemStack> extras = e.getPlayer().getInventory().addItem(item.getItemStack());
+            if (extras.isEmpty()) {
+                stringBuilder.append("c");
+                SpaceStacker.instance.getListOfItems().remove(id);
+                item.remove();
+                pickedUp = true;
+            } else {
+                stringBuilder.append("d");
+                int amount = 0;
+                for (Map.Entry<Integer, ItemStack> entry : extras.entrySet()) {
+                    amount += entry.getValue().getAmount();
                 }
-                HashMap<Integer, ItemStack> itemsa = e.getPlayer().getInventory().addItem(item.getItemStack());
-                if (!itemsa.isEmpty()) {
-                    SpaceStacker.instance.getListOfItems().get(id).setStackAmount(i - (x - itemsa.get(0).getAmount()));
-                    if (SpaceStacker.instance.getListOfItems().get(id).getStackAmount() <= 0) {
-                        SpaceStacker.instance.getListOfItems().get(id).getItem().remove();
-                        SpaceStacker.instance.getListOfItems().remove(id);
-                    } else {
-                        SpaceStacker.instance.getListOfItems().get(id).updateName();
-                    }
-                    return;
+                if (amount <= 0) {
+                    SpaceStacker.instance.getListOfItems().remove(id);
+                    item.remove();
                 } else {
-                    pickedUp = true;
-                    SpaceStacker.instance.getListOfItems().get(id).setStackAmount(i - 64);
-                    if (SpaceStacker.instance.getListOfItems().get(id).getStackAmount() <= 0) {
-                        SpaceStacker.instance.getListOfItems().get(id).getItem().remove();
-                        SpaceStacker.instance.getListOfItems().remove(id);
-                    } else {
-                        SpaceStacker.instance.getListOfItems().get(id).updateName();
-                    }
+                    SpaceStacker.instance.getListOfItems().get(id).setStackAmount(amount);
                 }
             }
+            //Bukkit.broadcastMessage(stringBuilder.toString());
+//            for (int i = sI.getStackAmount(); i > 0; i -= 64) {
+//                int x;
+//                if (i > 64) {
+//                    item.getItemStack().setAmount(64);
+//                    x = 64;
+//                } else {
+//                    item.getItemStack().setAmount(i);
+//                    x = i;
+//                }
+//                HashMap<Integer, ItemStack> itemsa = e.getPlayer().getInventory().addItem(item.getItemStack());
+//                if (!itemsa.isEmpty()) {
+//                    SpaceStacker.instance.getListOfItems().get(id).setStackAmount(i - (x - itemsa.get(0).getAmount()));
+//                    if (SpaceStacker.instance.getListOfItems().get(id).getStackAmount() <= 0) {
+//                        SpaceStacker.instance.getListOfItems().get(id).getItem().remove();
+//                        SpaceStacker.instance.getListOfItems().remove(id);
+//                    } else {
+//                        SpaceStacker.instance.getListOfItems().get(id).updateName();
+//                    }
+//                    return;
+//                } else {
+//                    pickedUp = true;
+//                    SpaceStacker.instance.getListOfItems().get(id).setStackAmount(i - 64);
+//                    if (SpaceStacker.instance.getListOfItems().get(id).getStackAmount() <= 0) {
+//                        SpaceStacker.instance.getListOfItems().get(id).getItem().remove();
+//                        SpaceStacker.instance.getListOfItems().remove(id);
+//                    } else {
+//                        SpaceStacker.instance.getListOfItems().get(id).updateName();
+//                    }
+//                }
+//            }
             if (pickedUp) {
-                e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 0);
+                for (Sound sound : Sound.values()) {
+                    if (sound.name().contains("PICKUP")) {
+                        e.getPlayer().playSound(e.getPlayer().getLocation(), sound, 1, 0);
+                        break;
+                    }
+                }
             }
             //SpaceStacker.instance.getListOfItems().get(id).getItem().remove();
             //SpaceStacker.instance.getListOfItems().remove(id);
@@ -77,12 +106,12 @@ public class ItemDrop implements Listener {
 //		}
     }
 
-    @EventHandler
-    public void onEntityPickup(EntityPickupItemEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
-            event.setCancelled(true);
-        }
-    }
+//    @EventHandler
+//    public void onEntityPickup(EntityPickupItemEvent event) {
+//        if (!(event.getEntity() instanceof Player)) {
+//            event.setCancelled(true);
+//        }
+//    }
 
 
     @EventHandler

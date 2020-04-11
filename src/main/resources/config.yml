@@ -18,6 +18,7 @@
 # SpaceStacker by Joeyoey <3
 settings:
   debug: false
+  ASkyblock: false
   inv-name: '&b%entity% Upgrade Spawner'
   inv-size: 27 # must be multiple of 9 up to a maximum of 54
   filler-material: STAINED_GLASS_PANE
@@ -78,13 +79,13 @@ entities: # You can add any and all entities as long as their name matches spigo
       
 formats:
   # Format for the spawner item in the inventory of the player.
-  tier-spawner:
+  tier-spawner: # You need %entity% either in the name or the lore, if you don't have it in either the plugin will shutdown
     name: '%entity% spawner'
-    lore: # Amount and Upgrade is NECCESARY otherwise plugin will assume only one spawner is placed or a null upgrade is placed.
+    lore: # Amount and Upgrade is NECCESARY otherwise plugin will assume only one spawner is placed or a null upgrade is placed. placeholders: %upgrade%, %amount%, %entity%
     - ' '
     - 'Upgrade: %upgrade%'
     - 'Amount: %amount%'
-    - 'Entity: %entity%%'
+    - ' '
     - ' '
   
   # To any of these formats you can add or remove Color, placeholders and all the sorts.

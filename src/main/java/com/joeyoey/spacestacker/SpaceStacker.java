@@ -112,9 +112,9 @@ public class SpaceStacker extends JavaPlugin {
 
             @Override
             public void run() {
-                getLogger().log(Level.SEVERE, "Saving Spawner data");
+                getLogger().log(Level.INFO, ChatColor.DARK_PURPLE + "Saving Spawner data");
                 saveData();
-                getLogger().log(Level.SEVERE, "Spawner data saved!");
+                getLogger().log(Level.INFO, ChatColor.LIGHT_PURPLE + "Spawner data saved!");
             }
 
         }.runTaskTimerAsynchronously(this, 0, saveFrequency);
@@ -224,7 +224,7 @@ public class SpaceStacker extends JavaPlugin {
                         stackedSpawners.put(jLoc, ss);
                     }
                 } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
-                    getLogger().log(Level.SEVERE, "Looks like you havent placed any spawners yet! Enjoy the plugin.");
+                    getLogger().log(Level.INFO, "Looks like you havent placed any spawners yet! Enjoy the plugin.");
                 }
                 stackedSpawners.values().forEach(StackedSpawner::updateHolo);
             }
@@ -276,7 +276,7 @@ public class SpaceStacker extends JavaPlugin {
                 savePBConfig();
             }
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
-            this.getLogger().log(Level.SEVERE, "Looks like you havent placed any spawners yet! Enjoy the plugin.");
+            this.getLogger().log(Level.INFO, "Looks like you havent placed any spawners yet! Enjoy the plugin.");
         }
         for (StackedSpawner spawner : stackedSpawners.values()) {
 
@@ -395,17 +395,40 @@ public class SpaceStacker extends JavaPlugin {
                         int slot = getConfig().getInt("entities." + entity + "." + matString + ".slot");
                         double cost = getConfig().getDouble("entities." + entity + "." + matString + ".cost");
                         String name = getConfig().getString("entities." + entity + "." + matString + ".name");
-                        entry.add(new UpgradeContainer(slot, mat, cost, name));
+
+                        List<String> initGLore = new ArrayList<>();
+                        if (getConfig().isList("entities." + entity + "." + matString + ".gui-lore")) {
+                            initGLore = getConfig().getStringList("entities." + entity + "." + matString + ".gui-lore");
+                        }
+
+                        List<String> guiLore = new ArrayList<>();
+
+
+                        if (!initGLore.isEmpty()) {
+                            initGLore.forEach(string -> guiLore.add(ChatColor.translateAlternateColorCodes('&', string)));
+                        }
+                        entry.add(new UpgradeContainer(slot, mat, cost, name, guiLore));
                     } catch (Exception e) {
                         String matValid = matString.toUpperCase();
                         Material mat = Material.getMaterial(matValid);
                         int slot = getConfig().getInt("entities." + entity + "." + matString + ".slot");
                         double cost = getConfig().getDouble("entities." + entity + "." + matString + ".cost");
-                        entry.add(new UpgradeContainer(slot, mat, cost));
+                        List<String> initGLore = new ArrayList<>();
+                        if (getConfig().isList("entities." + entity + "." + matString + ".gui-lore")) {
+                            initGLore = getConfig().getStringList("entities." + entity + "." + matString + ".gui-lore");
+                        }
+
+                        List<String> guiLore = new ArrayList<>();
+
+
+                        if (!initGLore.isEmpty()) {
+                            initGLore.forEach(string -> guiLore.add(ChatColor.translateAlternateColorCodes('&', string)));
+                        }
+                        entry.add(new UpgradeContainer(slot, mat, cost, guiLore));
                     }
                 });
                 entityUpgrades.put(ent, entry);
-                getLogger().severe("Loaded : " + entry.size() + " for type: " + ent.name());
+                if (debug) getLogger().info("Loaded : " + entry.size() + " for type: " + ent.name());
             });
         } else {
             getConfig().getConfigurationSection("entities").getKeys(false).forEach(entity -> {
@@ -461,7 +484,7 @@ public class SpaceStacker extends JavaPlugin {
                     }
                 });
                 entityUpgrades.put(ent, entry);
-                getLogger().severe("Loaded : " + entry.size() + " for type: " + ent.name());
+                if (debug) getLogger().info("Loaded : " + entry.size() + " for type: " + ent.name());
             });
         }
 

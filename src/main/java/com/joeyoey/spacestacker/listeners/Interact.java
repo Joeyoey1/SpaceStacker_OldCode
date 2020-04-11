@@ -51,30 +51,42 @@ public class Interact implements Listener {
 	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("a");
 		if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && !e.getPlayer().isSneaking()) {
+			stringBuilder.append("b");
 			if (e.getClickedBlock().getType().equals(Material.valueOf("MOB_SPAWNER"))) {
+				stringBuilder.append("c");
 				JoLocation jLoc = new JoLocation(e.getClickedBlock().getLocation());
 				CreatureSpawner cs = (CreatureSpawner) e.getClickedBlock().getState();
 				if (SpaceStacker.instance.getStackedSpawners().containsKey(jLoc)) {
+					stringBuilder.append("d");
 					buildInvOpen(e.getPlayer(), cs.getSpawnedType(), SpaceStacker.instance.getStackedSpawners().get(jLoc));
 					SpaceStacker.instance.getpBound().put(e.getPlayer(), new InventoryCheck(cs.getSpawnedType(), jLoc));
 				} else if (SpaceStacker.instance.getEntityUpgrades().containsKey(cs.getSpawnedType())) {
+					stringBuilder.append("e");
 					SpaceStacker.instance.getStackedSpawners().put(jLoc, new StackedSpawner(cs.getSpawnedType(), Material.AIR, jLoc));
 					buildInvOpen(e.getPlayer(), cs.getSpawnedType(), SpaceStacker.instance.getStackedSpawners().get(jLoc));
 					SpaceStacker.instance.getpBound().put(e.getPlayer(), new InventoryCheck(cs.getSpawnedType(), jLoc));
 				} else {
+					SpaceStacker.instance.getLogger().info(stringBuilder.toString());
 					return;
 				}
 			}
 		} else {
+			SpaceStacker.instance.getLogger().info(stringBuilder.toString());
 			return;
 		}
+		SpaceStacker.instance.getLogger().info(stringBuilder.toString());
 	}
 	
 	
 	@SuppressWarnings("deprecation")
 	public void buildInvOpen(Player p, EntityType eType, StackedSpawner cs) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(1);
 		if (SpaceStacker.instance.getEntityUpgrades().containsKey(eType)) {
+			stringBuilder.append(2);
 			Inventory inv = Bukkit.createInventory(null, invSize, ChatColor.translateAlternateColorCodes('&', invName.replaceAll("%entity%", StringUtils.capitaliseAllWords(eType.toString().replaceAll("_", " ").toLowerCase()))));
 			ItemStack is = new ItemStack(mat, 1, data);
 			ItemMeta im = is.getItemMeta();
@@ -92,7 +104,8 @@ public class Interact implements Listener {
 			} catch (NullPointerException e) {
 				
 			}
-			
+			stringBuilder.append(3);
+
 			for (UpgradeContainer container : SpaceStacker.instance.getEntityUpgrades().get(eType)) {
 				Material mat = container.getMat();
 				int slot = container.getSlot();
@@ -125,9 +138,13 @@ public class Interact implements Listener {
 				item.setItemMeta(itemMeta);
 				inv.setItem(slot, item);
 			}
+			stringBuilder.append(4);
 			SpaceStacker.instance.getOpenInv().put(p.getUniqueId(), inv);
 			p.openInventory(inv);
 		}
+		stringBuilder.append(5);
+		SpaceStacker.instance.getLogger().info(stringBuilder.toString());
+
 	}
 	
 	

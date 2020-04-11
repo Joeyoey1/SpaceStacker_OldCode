@@ -5,11 +5,8 @@ import com.joeyoey.spacestacker.events.SpawnerBreakEvent;
 import com.joeyoey.spacestacker.objects.JoLocation;
 import com.joeyoey.spacestacker.objects.StackedSpawner;
 import com.joeyoey.spacestacker.util.MessageFactory;
-import com.wasteofplastic.askyblock.ASkyBlockAPI;
-import com.wasteofplastic.askyblock.Island;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -18,11 +15,10 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -36,7 +32,7 @@ public class Break implements Listener {
 	
 	
 	@SuppressWarnings("deprecation")
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreak(BlockBreakEvent e) {
 		String debug = "7";
 
@@ -52,15 +48,15 @@ public class Break implements Listener {
 
 			JoLocation jLoc = new JoLocation(e.getBlock().getLocation());
 			if (SpaceStacker.instance.getStackedSpawners().containsKey(jLoc)) {
-				if (ASkyBlockAPI.getInstance().playerIsOnIsland(e.getPlayer())) {
-					Island island = ASkyBlockAPI.getInstance().getIslandAt(e.getBlock().getLocation());
-					if (!island.getMembers().contains(e.getPlayer().getUniqueId())) {
-						if (!ASkyBlockAPI.getInstance().getCoopIslands(e.getPlayer()).contains(ASkyBlockAPI.getInstance().getIslandAt(e.getBlock().getLocation()).getCenter())) {
-							e.setCancelled(true);
-							return;
-						}
-					}
-				}
+//				if (SpaceStacker.instance.getConfig().getBoolean("settings.ASkyblock") && ASkyBlockAPI.getInstance().playerIsOnIsland(e.getPlayer())) {
+//					Island island = ASkyBlockAPI.getInstance().getIslandAt(e.getBlock().getLocation());
+//					if (!island.getMembers().contains(e.getPlayer().getUniqueId())) {
+//						if (!ASkyBlockAPI.getInstance().getCoopIslands(e.getPlayer()).contains(ASkyBlockAPI.getInstance().getIslandAt(e.getBlock().getLocation()).getCenter())) {
+//							e.setCancelled(true);
+//							return;
+//						}
+//					}
+//				}
 				debug += "1";
 
 				if ((e.getPlayer().hasPermission("spacestacker.silk") && e.getPlayer().getInventory().getItemInHand().getType().equals(Material.DIAMOND_PICKAXE) && e.getPlayer().getInventory().getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) || e.getPlayer().isOp() || e.getPlayer().hasPermission("spacestacker.nosilk")) {

@@ -152,34 +152,31 @@ public class Break implements Listener {
 				}
 			} else {
 				debug += "2";
+				if ((e.getPlayer().hasPermission("spacestacker.silk") && e.getPlayer().getInventory().getItemInHand().getType().equals(Material.DIAMOND_PICKAXE) && e.getPlayer().getInventory().getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) || e.getPlayer().isOp() || e.getPlayer().hasPermission("spacestacker.nosilk")) {
+					e.setCancelled(true);
+					CreatureSpawner cspawn = (CreatureSpawner) e.getBlock().getState();
+					EntityType eType = cspawn.getSpawnedType();
+					int amount = 1;
 
-				CreatureSpawner cspawn = (CreatureSpawner) e.getBlock().getState();
-				EntityType eType = cspawn.getSpawnedType();
-				int amount = 1;
-				Material mat = Material.AIR;
-				
-				ItemStack is = new ItemStack(Material.valueOf("MOB_SPAWNER"));
-				ItemMeta bMeta = is.getItemMeta();
+					ItemStack is = new ItemStack(Material.valueOf("MOB_SPAWNER"));
+					ItemMeta bMeta = is.getItemMeta();
 //				CreatureSpawner cs = (CreatureSpawner) bMeta.getBlockState();
 //				cs.setSpawnedType(eType);
 //				bMeta.setBlockState(cs);
-				bMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', SpaceStacker.instance.getConfig().getString("formats.tier-spawner.name").replaceAll("%entity%", StringUtils.capitaliseAllWords(eType.toString().toLowerCase()))));
-				List<String> lore = new ArrayList<String>();
-				for (String s : SpaceStacker.instance.getConfig().getStringList("formats.tier-spawner.lore")) {
-					if (mat != Material.AIR) {
-						lore.add(ChatColor.translateAlternateColorCodes('&', s.replaceAll("%upgrade%", StringUtils.capitaliseAllWords(mat.toString().toLowerCase())).replaceAll("%amount%", amount + "")));
-					} else {
+					bMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', SpaceStacker.instance.getConfig().getString("formats.tier-spawner.name").replaceAll("%entity%", StringUtils.capitaliseAllWords(eType.toString().toLowerCase()))));
+					List<String> lore = new ArrayList<String>();
+					for (String s : SpaceStacker.instance.getConfig().getStringList("formats.tier-spawner.lore")) {
 						lore.add(ChatColor.translateAlternateColorCodes('&', s.replaceAll("%upgrade%", "&c&l&oDEFAULT").replaceAll("%amount%", amount + "")));
 					}
+					bMeta.setLore(lore);
+					is.setItemMeta(bMeta);
+					e.getPlayer().getInventory().addItem(is);
+					e.getBlock().setType(Material.AIR);
+					if (SpaceStacker.instance.debug) {
+						SpaceStacker.instance.getLogger().log(Level.SEVERE, debug);
+					}
 				}
-				bMeta.setLore(lore);
-				is.setItemMeta(bMeta);
-				e.getPlayer().getInventory().addItem(is);
-				if (SpaceStacker.instance.debug) {
-					SpaceStacker.instance.getLogger().log(Level.SEVERE, debug);
-				}
-				return;
-			} 
+			}
 		} else {
 			debug += "3";
 

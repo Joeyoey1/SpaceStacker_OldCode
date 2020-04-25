@@ -19,7 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -28,17 +31,17 @@ public class SpawnerSpawn implements Listener {
 	private static Map<EntityType, ItemStack> defaultDrops = new HashMap<>();
 
 	@EventHandler
-	public void onSpawn(SpawnerSpawnEvent e) {
+	public void onSpawn(SpawnerSpawnEvent event) {
 		try {
-			JoLocation jLoc = new JoLocation(e.getSpawner().getLocation());
+			JoLocation jLoc = new JoLocation(event.getSpawner().getLocation());
 			if (SpaceStacker.instance.getStackedSpawners().containsKey(jLoc)) {
 				StackedSpawner ss = SpaceStacker.instance.getStackedSpawners().get(jLoc);
 				if (!ss.isSpawnable()) {
-                    e.setCancelled(true);
+                    event.setCancelled(true);
                     return;
                 }
 					ItemStack item = ss.getItemStack();
-					UUID id = e.getEntity().getUniqueId();
+					UUID id = event.getEntity().getUniqueId();
 					int stackAmt = ss.getStackAmount();
 					int[] amt = { 0 };
 					CompletableFuture<Void> compFuture = CompletableFuture.runAsync(() -> amt[0] = sumEntity(stackAmt));
@@ -49,27 +52,27 @@ public class SpawnerSpawn implements Listener {
 							if (amt[0] > SpaceStacker.instance.getMaxEntityStack()) {
 								for (int i = amt[0]; i > 0; i -= SpaceStacker.instance.getMaxEntityStack()) {
 									if (i > SpaceStacker.instance.getMaxEntityStack()) {
-										Entity ent = e.getLocation().getWorld().spawnEntity(e.getLocation(),
-												e.getEntityType());
-										LivingEntity livingEntity = (LivingEntity) ent;
-										ent.setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
-										SpaceStacker.instance.getListOfEnt().put(ent.getUniqueId(),
-												new StackedEntity(ent, item,
+										Entity entity = event.getLocation().getWorld().spawnEntity(event.getLocation(),
+												event.getEntityType());
+										LivingEntity livingEntity = (LivingEntity) entity;
+										entity.setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
+										SpaceStacker.instance.getListOfEnt().put(entity.getUniqueId(),
+												new StackedEntity(entity, item,
 														SpaceStacker.instance.getMaxEntityStack(),
-														ent.getUniqueId()));
-										SpaceStacker.instance.getListOfEnt().get(ent.getUniqueId()).updateName();
-										tryAll(SpaceStacker.instance.getListOfEnt().get(ent.getUniqueId()));
+														entity.getUniqueId()));
+										SpaceStacker.instance.getListOfEnt().get(entity.getUniqueId()).updateName();
+										tryAll(SpaceStacker.instance.getListOfEnt().get(entity.getUniqueId()));
 									} else {
 										SpaceStacker.instance.getListOfEnt().put(id,
-												new StackedEntity(e.getEntity(), item, i, id));
-										e.getEntity().setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
+												new StackedEntity(event.getEntity(), item, i, id));
+										event.getEntity().setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
 										SpaceStacker.instance.getListOfEnt().get(id).updateName();
 										tryAll(SpaceStacker.instance.getListOfEnt().get(id));
 									}
 								}
 							} else {
 								SpaceStacker.instance.getListOfEnt().put(id,
-										new StackedEntity(e.getEntity(), item, amt[0], id));
+										new StackedEntity(event.getEntity(), item, amt[0], id));
 								SpaceStacker.instance.getListOfEnt().get(id).updateName();
 								tryAll(SpaceStacker.instance.getListOfEnt().get(id));
 							}
@@ -78,9 +81,9 @@ public class SpawnerSpawn implements Listener {
 					}.runTask(SpaceStacker.instance));
 			}
 		} catch (NullPointerException ex) {
-			UUID id = e.getEntity().getUniqueId();
-			SpaceStacker.instance.getListOfEnt().put(e.getEntity().getUniqueId(),
-					new StackedEntity(e.getEntity(), Material.STONE, 1, id));
+			UUID id = event.getEntity().getUniqueId();
+			SpaceStacker.instance.getListOfEnt().put(event.getEntity().getUniqueId(),
+					new StackedEntity(event.getEntity(), Material.STONE, 1, id));
 			SpaceStacker.instance.getListOfEnt().get(id).updateName();
 			tryAll(SpaceStacker.instance.getListOfEnt().get(id));
 		}
@@ -99,14 +102,14 @@ public class SpawnerSpawn implements Listener {
 						aa.getBaseEnt().setCustomNameVisible(false);
 					} catch (NullPointerException ignored) {
 					}
-					return;
+					break;
 				} else if (!a.getBaseEnt().isValid()) {
 					SpaceStacker.instance.getListOfEnt().remove(a.getId());
 					try {
 						a.getBaseEnt().setCustomNameVisible(false);
 					} catch (NullPointerException ignored) {
 					}
-					return;
+					break;
 				}
 			}
 		}
@@ -116,6 +119,7 @@ public class SpawnerSpawn implements Listener {
 				stackedEntity.getBaseEnt().remove();
 			}
 		}
+		SpaceStacker.instance.getTimedOutMobs().clear();
 	} //
 
 	@EventHandler

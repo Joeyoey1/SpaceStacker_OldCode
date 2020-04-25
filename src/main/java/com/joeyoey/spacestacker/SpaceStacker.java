@@ -85,6 +85,7 @@ public class SpaceStacker extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SpawnerSpawn(), this);
         getServer().getPluginManager().registerEvents(new ItemDrop(), this);
         getServer().getPluginManager().registerEvents(new ItemMerge(this), this);
+        //getServer().getPluginManager().registerEvents(new EventTest(), this);
 
         getCommand("spacespawners").setExecutor(new StackerCommands(this));
         getCommand("spacespawners").setTabCompleter(new StackerCommands(this));
@@ -155,7 +156,7 @@ public class SpaceStacker extends JavaPlugin {
                             item.remove();
                             continue;
                         }
-                        if (!stackedItem.getItem().isValid() || tryAll(stackedItem)) {
+                        if (! stackedItem.getItem().isValid() || tryAll(stackedItem)) {
                             item.remove();
                         }
                     }
@@ -170,7 +171,7 @@ public class SpaceStacker extends JavaPlugin {
         instance = null;
         getLogger().log(Level.INFO, "Stopping Item Task...");
         itemTask.cancel();
-        while (!itemTask.isCancelled()) {
+        while (! itemTask.isCancelled()) {
             itemTask.cancel();
         }
         for (StackedEntity e : listOfEnt.values()) {
@@ -211,10 +212,10 @@ public class SpaceStacker extends JavaPlugin {
                         }
                         ItemStack is = new ItemStack(mat);
                         ItemMeta im = is.getItemMeta();
-                        if (!name.equals(" ")) {
+                        if (! name.equals(" ")) {
                             im.setDisplayName(name);
                         }
-                        if (!lore.isEmpty()) {
+                        if (! lore.isEmpty()) {
                             im.setLore(lore);
                         }
                         is.setItemMeta(im);
@@ -383,7 +384,7 @@ public class SpaceStacker extends JavaPlugin {
 
     public void loadCustomSpawnerTypes() {
         entityUpgrades.clear();
-        if (!itemStack) {
+        if (! itemStack) {
             getConfig().getConfigurationSection("entities").getKeys(false).forEach(entity -> {
                 String eType = entity.toUpperCase();
                 EntityType ent = EntityType.valueOf(eType);
@@ -404,7 +405,7 @@ public class SpaceStacker extends JavaPlugin {
                         List<String> guiLore = new ArrayList<>();
 
 
-                        if (!initGLore.isEmpty()) {
+                        if (! initGLore.isEmpty()) {
                             initGLore.forEach(string -> guiLore.add(ChatColor.translateAlternateColorCodes('&', string)));
                         }
                         entry.add(new UpgradeContainer(slot, mat, cost, name, guiLore));
@@ -421,7 +422,7 @@ public class SpaceStacker extends JavaPlugin {
                         List<String> guiLore = new ArrayList<>();
 
 
-                        if (!initGLore.isEmpty()) {
+                        if (! initGLore.isEmpty()) {
                             initGLore.forEach(string -> guiLore.add(ChatColor.translateAlternateColorCodes('&', string)));
                         }
                         entry.add(new UpgradeContainer(slot, mat, cost, guiLore));
@@ -457,28 +458,28 @@ public class SpaceStacker extends JavaPlugin {
                         List<String> guiLore = new ArrayList<>();
 
 
-                        if (!initGLore.isEmpty()) {
+                        if (! initGLore.isEmpty()) {
                             initGLore.forEach(string -> {
                                 guiLore.add(ChatColor.translateAlternateColorCodes('&', string));
                             });
                         }
 
                         List<String> lore = new ArrayList<>();
-                        if (!initLore.isEmpty()) {
+                        if (! initLore.isEmpty()) {
                             initLore.forEach(string -> {
                                 lore.add(ChatColor.translateAlternateColorCodes('&', string));
                             });
                         }
                         ItemStack item = new ItemStack(mat, 1, data);
                         ItemMeta iMeta = item.getItemMeta();
-                        if (!name.equals(" ")) {
+                        if (! name.equals(" ")) {
                             iMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
                         }
                         iMeta.setLore(lore);
                         item.setItemMeta(iMeta);
                         entry.add(new UpgradeContainer(slot, item, cost, guiName, guiLore));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                         getLogger().severe("ERROR while loading spawner types check your config.yml");
                         this.setEnabled(false);
                     }
@@ -515,7 +516,7 @@ public class SpaceStacker extends JavaPlugin {
 
     private void createPBConfig() {
         playerBalanceConfigFile = new File(getDataFolder(), "StackedSpawners.yml");
-        if (!playerBalanceConfigFile.exists()) {
+        if (! playerBalanceConfigFile.exists()) {
             playerBalanceConfigFile.getParentFile().mkdirs();
             saveResource("StackedSpawners.yml", false);
         }

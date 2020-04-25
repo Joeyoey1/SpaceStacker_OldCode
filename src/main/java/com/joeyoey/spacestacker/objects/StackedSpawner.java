@@ -215,7 +215,8 @@ public class StackedSpawner implements Serializable {
 			holo.removeLine(0);
 		}
 
-		
+		if (!(this.jLoc.getBlock().getBlock().getState() instanceof CreatureSpawner)) return false;
+
 		CreatureSpawner cs = (CreatureSpawner) this.jLoc.getBlock().getBlock().getState();
 		
 		if (cs.getSpawnedType() != this.entity) {
@@ -255,11 +256,7 @@ public class StackedSpawner implements Serializable {
 			if (this.getChunkZ() == a.getChunkZ()) {
 				if (this.getEntity().equals(a.getEntity())) {
 					if (this.getMat().equals(a.getMat())) {
-						if (this.jLoc.equals(a.getjLoc())) {
-							return false;
-						} else {
-							return true;
-						}
+						return ! this.jLoc.equals(a.getjLoc());
 					} else {
 						return false;
 					}

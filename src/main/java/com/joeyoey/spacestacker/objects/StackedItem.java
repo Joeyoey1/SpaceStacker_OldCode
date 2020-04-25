@@ -101,19 +101,14 @@ public class StackedItem {
 		if (itemStack == null)
 			return false;
 		final String typeNameString = itemStack.getType().name();
-		if (typeNameString.endsWith("_HELMET")
+		return typeNameString.endsWith("_HELMET")
 				|| typeNameString.endsWith("_CHESTPLATE")
 				|| typeNameString.endsWith("_LEGGINGS")
 				|| typeNameString.endsWith("_BOOTS")
 				|| typeNameString.endsWith("SWORD")
 				|| typeNameString.endsWith("PICKAXE")
 				|| typeNameString.endsWith("SHOVEL")
-				|| typeNameString.endsWith("HOE")
-				) {
-			return true;
-		}
-
-		return false;
+				|| typeNameString.endsWith("HOE");
 	}
 
 	public boolean tryStack(StackedItem a) {

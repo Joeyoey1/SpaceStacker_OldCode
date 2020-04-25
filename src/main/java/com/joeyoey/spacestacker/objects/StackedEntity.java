@@ -124,11 +124,7 @@ public class StackedEntity {
 				if (this.baseEnt.getType().equals(a.getBaseEnt().getType())) {
 					if (JaroAlg.getJaroWinkler(this.getBaseEnt().getCustomName(),
 							a.getBaseEnt().getCustomName()) > .7) {
-						if (this.matToDrop.equals(a.getMatToDrop())) {
-							return true;
-						} else {
-							return false;
-						}
+                        return this.matToDrop.equals(a.getMatToDrop());
 					} else {
 						return false;
 					}

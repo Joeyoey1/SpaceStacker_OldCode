@@ -1,6 +1,8 @@
 package com.joeyoey.spacestacker.listeners;
 
 import com.joeyoey.spacestacker.SpaceStacker;
+import com.joeyoey.spacestacker.events.SpawnerBreakEvent;
+import com.joeyoey.spacestacker.events.SpawnerPlaceEvent;
 import com.joeyoey.spacestacker.objects.JoLocation;
 import com.joeyoey.spacestacker.objects.StackedSpawner;
 import com.joeyoey.spacestacker.objects.UpgradeContainer;
@@ -191,8 +193,9 @@ public class Place implements Listener {
 
                     StackedSpawner spawner = new StackedSpawner(eType[0], is, jLoc);
                     spawner.setStackAmount(amount[0]);
-                    SpaceStacker.instance.getStackedSpawners().put(jLoc, spawner);
-                    spawner.updateHolo();
+
+                    spawner = createEvent(e, jLoc, spawner);
+                    if (spawner == null) return;
                     CreatureSpawner spawn = (CreatureSpawner) e.getBlock().getState();
                     spawn.setSpawnedType(eType[0]);
                     spawn.update();
@@ -203,6 +206,7 @@ public class Place implements Listener {
                             play.closeInventory();
                         }
                     });
+                    StackedSpawner finalSpawner = spawner;
                     new BukkitRunnable() {
 
                         @Override
@@ -210,43 +214,20 @@ public class Place implements Listener {
                             CreatureSpawner spawn = (CreatureSpawner) e.getBlock().getState();
                             spawn.setSpawnedType(eType[0]);
                             spawn.update();
-                            spawner.updateHolo();
-                            tryAll(spawner);
+                            finalSpawner.updateHolo();
+                            tryAll(finalSpawner);
                         }
 
                     }.runTaskLater(SpaceStacker.instance, 1);
                 } else {
                     new BukkitRunnable() {
                         public void run() {
-                            StackedSpawner spawner = new StackedSpawner(e.getBlock().getChunk().getX(),
-                                    e.getBlock().getChunk().getZ(), 1, cs.getSpawnedType(), Material.AIR, jLoc);
-                            SpaceStacker.instance.getStackedSpawners().put(jLoc, spawner);
-                            new BukkitRunnable() {
-
-                                @Override
-                                public void run() {
-                                    spawner.updateHolo();
-                                    tryAll(spawner);
-                                }
-
-                            }.runTaskLater(SpaceStacker.instance, 1);
+                            createSpawnerAndCall(e, cs, jLoc);
                         }
                     }.runTaskLater(SpaceStacker.instance, 2);
                 }
             } else {
-                StackedSpawner spawner = new StackedSpawner(e.getBlock().getChunk().getX(),
-                        e.getBlock().getChunk().getZ(), 1, cs.getSpawnedType(), Material.AIR, jLoc);
-                SpaceStacker.instance.getStackedSpawners().put(jLoc, spawner);
-                spawner.updateHolo();
-                new BukkitRunnable() {
-
-                    @Override
-                    public void run() {
-                        spawner.updateHolo();
-                        tryAll(spawner);
-                    }
-
-                }.runTaskLater(SpaceStacker.instance, 1);
+                createSpawnerAndCall(e, cs, jLoc);
             }
         } else if (e.getBlock().getType().equals(Material.WATER)) {
             ItemStack inHand = e.getItemInHand();
@@ -266,6 +247,44 @@ public class Place implements Listener {
             }
             return;
         }
+    }
+
+    private void createSpawnerAndCall(BlockPlaceEvent e, CreatureSpawner cs, JoLocation jLoc) {
+        StackedSpawner spawner = new StackedSpawner(e.getBlock().getChunk().getX(),
+                e.getBlock().getChunk().getZ(), 1, cs.getSpawnedType(), Material.AIR, jLoc);
+
+        spawner = createEvent(e, jLoc, spawner);
+        if (spawner == null) return;
+
+        StackedSpawner finalSpawner = spawner;
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                finalSpawner.updateHolo();
+                tryAll(finalSpawner);
+            }
+
+        }.runTaskLater(SpaceStacker.instance, 1);
+    }
+
+    private StackedSpawner createEvent(BlockPlaceEvent e, JoLocation jLoc, StackedSpawner spawner) {
+        SpawnerPlaceEvent event = new SpawnerPlaceEvent(spawner, e.getPlayer(), e.getBlock().getLocation());
+
+        SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
+
+        if (event.isCancelled()) {
+            e.setCancelled(true);
+            event.getPlacedSpawner().getHolo().delete();
+            //e.getBlockPlaced().setType(Material.AIR);
+            return null;
+        }
+
+        spawner = event.getPlacedSpawner();
+
+        SpaceStacker.instance.getStackedSpawners().put(jLoc, spawner);
+        spawner.updateHolo();
+        return spawner;
     }
 
     public void tryAll(StackedSpawner ss) {

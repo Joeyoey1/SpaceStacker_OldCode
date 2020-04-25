@@ -71,6 +71,7 @@ public class Break implements Listener {
 					SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
 
 					if (event.isCancelled()) {
+						e.setCancelled(true);
 						return;
 					}	
 					

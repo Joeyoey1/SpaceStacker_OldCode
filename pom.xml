@@ -6,7 +6,7 @@
 
     <groupId>com.joeyoey</groupId>
     <artifactId>SpaceStacker</artifactId>
-    <version>1.9.2-SNAPSHOT</version>
+    <version>1.9.4.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>SpaceStackerFix</name>

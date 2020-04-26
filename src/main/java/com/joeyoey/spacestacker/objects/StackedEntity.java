@@ -119,7 +119,7 @@ public class StackedEntity {
 			return false;
 		}
 		if (this.baseEnt.getLocation().getWorld().equals(a.getBaseEnt().getLocation().getWorld())) {
-			if (this.baseEnt.getLocation().distance(a.getBaseEnt().getLocation()) < SpaceStacker.mergeDist
+			if (this.baseEnt.getLocation().distance(a.getBaseEnt().getLocation()) < SpaceStacker.instance.getMergeDist()
 					&& !this.baseEnt.getLocation().equals(a.getBaseEnt().getLocation())) {
 				if (this.baseEnt.getType().equals(a.getBaseEnt().getType())) {
 					if (JaroAlg.getJaroWinkler(this.getBaseEnt().getCustomName(),

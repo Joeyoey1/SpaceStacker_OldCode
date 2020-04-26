@@ -81,7 +81,7 @@ public class StackedItem {
 		if (!this.getId().equals(a.getId())) {
 			if (this.getItem().getItemStack().isSimilar(a.getItem().getItemStack()) && !isNonStacable(this.getItem().getItemStack())) {
 				if (this.getItem().getLocation().getWorld().equals(a.getItem().getLocation().getWorld())) {
-					if (this.getItem().getLocation().distanceSquared(a.getItem().getLocation()) < SpaceStacker.mergeDist) {
+					if (this.getItem().getLocation().distanceSquared(a.getItem().getLocation()) < SpaceStacker.instance.getMergeDist()) {
 						return a.getItem().isValid() && this.getItem().isValid();
 					} else {
 						return false;

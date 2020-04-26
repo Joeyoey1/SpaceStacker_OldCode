@@ -33,35 +33,58 @@ import java.util.logging.Level;
 
 public class SpaceStacker extends JavaPlugin {
 
+    /*
+    Statics
+     */
     public static SpaceStacker instance;
-    public static int mergeDist;
-    public static boolean itemStack;
+
+    /*
+    Settings
+     */
     public boolean debug;
-    private Map<JoLocation, StackedSpawner> stackedSpawners = new HashMap<>();
-    private Map<UUID, StackedEntity> listOfEnt = new HashMap<>();
-    private Map<Player, InventoryCheck> pBound = new HashMap<>();
-    private Map<EntityType, List<UpgradeContainer>> entityUpgrades = new HashMap<>();
-    private Map<UUID, Material> mobDrops = new HashMap<>();
-    private Economy economy = null;
-    private Map<UUID, Inventory> openInv = new HashMap<>();
-    private List<Hologram> visibility = new ArrayList<>();
-    private Map<UUID, StackedItem> listOfItems = new ConcurrentHashMap<>();
-    private File playerBalanceConfigFile;
-    private FileConfiguration playerBalanceConfig;
+    private boolean hoverUpgrade;
+    private boolean itemStack;
+
     private int saveFrequency;
     private int holoViewDist;
-    private List<DamageCause> instantAllKill = new ArrayList<>();
     private int maxSpawnerStack;
     private int maxItemStack;
     private int maxEntityStack;
+    private int mergeDist;
+
     private String entityFormat;
     private String spawnerFormat;
     private String itemFormat;
-    private boolean hoverUpgrade;
+
+    private List<DamageCause> instantAllKill = new ArrayList<>();
+
     private Set<SpawnReason> reasons = new HashSet<>();
-    private BukkitTask itemTask;
-    private int times;
+
+    private Map<EntityType, List<UpgradeContainer>> entityUpgrades = new HashMap<>();
+    private Map<UUID, Material> mobDrops = new HashMap<>();
+
+    /*
+    Runtime variables
+     */
+
+    private Map<JoLocation, StackedSpawner> stackedSpawners = new HashMap<>();
+    private Map<UUID, StackedEntity> listOfEnt = new HashMap<>();
+    private Map<Player, InventoryCheck> pBound = new HashMap<>();
+    private Map<UUID, Inventory> openInv = new HashMap<>();
+    private Map<UUID, StackedItem> listOfItems = new ConcurrentHashMap<>();
+
+    private List<Hologram> visibility = new ArrayList<>();
+
     private Set<StackedEntity> timedOutMobs = new HashSet<>();
+
+    private Economy economy = null;
+
+    private File playerBalanceConfigFile;
+    private FileConfiguration playerBalanceConfig;
+
+    private BukkitTask itemTask;
+
+    private int times;
 
 
     public void onEnable() {
@@ -179,9 +202,9 @@ public class SpaceStacker extends JavaPlugin {
         for (StackedItem items : listOfItems.values()) {
             items.getItem().remove();
         }
-        getLogger().log(Level.WARNING, "Saving data!");
+        getLogger().log(Level.INFO, ChatColor.DARK_PURPLE + "Saving Spawner data");
         saveData();
-        getLogger().log(Level.WARNING, "Data saved!");
+        getLogger().log(Level.INFO, ChatColor.LIGHT_PURPLE + "Spawner data saved!");
     }
 
     public void loadData() {
@@ -349,9 +372,13 @@ public class SpaceStacker extends JavaPlugin {
         return maxSpawnerStack;
     }
 
-//    public Map<UUID, StackedItem> getToADD() {
-//        return toADD;
-//    }
+    public boolean isItemStackMode() {
+        return itemStack;
+    }
+
+    public int getMergeDist() {
+        return mergeDist;
+    }
 
     public int getMaxItemStack() {
         return maxItemStack;

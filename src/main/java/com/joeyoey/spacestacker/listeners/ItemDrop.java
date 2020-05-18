@@ -7,6 +7,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
@@ -24,11 +25,11 @@ import java.util.UUID;
 public class ItemDrop implements Listener {
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPickUp(PlayerPickupItemEvent e) {
 //		if (e.getEntity() instanceof Player) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("a");
+        stringBuilder.append("public void onPickUp(PlayerPickupItemEvent e) a");
         Item item = e.getItem();
         UUID id = item.getUniqueId();
         if (SpaceStacker.instance.getListOfItems().containsKey(id)) {
@@ -56,37 +57,7 @@ public class ItemDrop implements Listener {
                     SpaceStacker.instance.getListOfItems().get(id).setStackAmount(amount);
                 }
             }
-            //Bukkit.broadcastMessage(stringBuilder.toString());
-//            for (int i = sI.getStackAmount(); i > 0; i -= 64) {
-//                int x;
-//                if (i > 64) {
-//                    item.getItemStack().setAmount(64);
-//                    x = 64;
-//                } else {
-//                    item.getItemStack().setAmount(i);
-//                    x = i;
-//                }
-//                HashMap<Integer, ItemStack> itemsa = e.getPlayer().getInventory().addItem(item.getItemStack());
-//                if (!itemsa.isEmpty()) {
-//                    SpaceStacker.instance.getListOfItems().get(id).setStackAmount(i - (x - itemsa.get(0).getAmount()));
-//                    if (SpaceStacker.instance.getListOfItems().get(id).getStackAmount() <= 0) {
-//                        SpaceStacker.instance.getListOfItems().get(id).getItem().remove();
-//                        SpaceStacker.instance.getListOfItems().remove(id);
-//                    } else {
-//                        SpaceStacker.instance.getListOfItems().get(id).updateName();
-//                    }
-//                    return;
-//                } else {
-//                    pickedUp = true;
-//                    SpaceStacker.instance.getListOfItems().get(id).setStackAmount(i - 64);
-//                    if (SpaceStacker.instance.getListOfItems().get(id).getStackAmount() <= 0) {
-//                        SpaceStacker.instance.getListOfItems().get(id).getItem().remove();
-//                        SpaceStacker.instance.getListOfItems().remove(id);
-//                    } else {
-//                        SpaceStacker.instance.getListOfItems().get(id).updateName();
-//                    }
-//                }
-//            }
+
             if (pickedUp) {
                 for (Sound sound : Sound.values()) {
                     if (sound.name().contains("PICKUP")) {
@@ -95,14 +66,7 @@ public class ItemDrop implements Listener {
                     }
                 }
             }
-            //SpaceStacker.instance.getListOfItems().get(id).getItem().remove();
-            //SpaceStacker.instance.getListOfItems().remove(id);
-
-
         }
-//		} else {
-//			return;
-//		}
     }
 
 //    @EventHandler

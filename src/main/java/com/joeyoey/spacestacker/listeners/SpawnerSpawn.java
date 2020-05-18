@@ -6,6 +6,7 @@ import com.joeyoey.spacestacker.objects.JoLocation;
 import com.joeyoey.spacestacker.objects.StackedEntity;
 import com.joeyoey.spacestacker.objects.StackedItem;
 import com.joeyoey.spacestacker.objects.StackedSpawner;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -19,16 +20,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SpawnerSpawn implements Listener {
 
-	private static Map<EntityType, ItemStack> defaultDrops = new HashMap<>();
+	public static Map<EntityType, Set<ItemStack>> defaultDrops = new HashMap<>();
 
 	@EventHandler
 	public void onSpawn(SpawnerSpawnEvent event) {
@@ -73,6 +71,7 @@ public class SpawnerSpawn implements Listener {
 							} else {
 								SpaceStacker.instance.getListOfEnt().put(id,
 										new StackedEntity(event.getEntity(), item, amt[0], id));
+								event.getEntity().setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
 								SpaceStacker.instance.getListOfEnt().get(id).updateName();
 								tryAll(SpaceStacker.instance.getListOfEnt().get(id));
 							}
@@ -84,6 +83,7 @@ public class SpawnerSpawn implements Listener {
 			UUID id = event.getEntity().getUniqueId();
 			SpaceStacker.instance.getListOfEnt().put(event.getEntity().getUniqueId(),
 					new StackedEntity(event.getEntity(), Material.STONE, 1, id));
+			event.getEntity().setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
 			SpaceStacker.instance.getListOfEnt().get(id).updateName();
 			tryAll(SpaceStacker.instance.getListOfEnt().get(id));
 		}
@@ -136,7 +136,7 @@ public class SpawnerSpawn implements Listener {
 
 	@EventHandler
 	public void targetEvent(EntityTargetEvent e) {
-		if (e.getEntity().hasMetadata("STACKED")) {
+		if (e.getEntity().hasMetadata("STACKED") && SpaceStacker.instance.isNerfMobs()) {
 			e.setCancelled(true);
 		}
 	}
@@ -201,14 +201,13 @@ public class SpawnerSpawn implements Listener {
 					Material material = Material.STONE;
 
 					if (!isList.isEmpty()) {
-						material = isList.get(0).getType();
-						defaultDrops.put(e.getEntityType(), isList.get(0));
+						addDefaultDrop(e.getEntityType(), isList.get(0));
 						for (ItemStack itemStack : isList) {
-							StackedEntityDeathEvent event = new StackedEntityDeathEvent(stackEnt, p, amount, itemStack.getType(), xp);
+							StackedEntityDeathEvent event = new StackedEntityDeathEvent(stackEnt, p, amount, itemStack, xp);
 							SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
 
 							e.setDroppedExp(event.getExpDropped());
-							Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), new ItemStack(event.getMatDropped()));
+							Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), event.getItemDropped());
 							UUID itemId = item.getUniqueId();
 							int stackAmt = event.getAmountDropped();
 							StackedItem sI = new StackedItem(itemStack.getType(), stackAmt, item, itemId, System.currentTimeMillis());
@@ -218,15 +217,13 @@ public class SpawnerSpawn implements Listener {
 					}
 					if (material.equals(Material.STONE)) {
 						if (defaultDrops.containsKey(e.getEntityType())) {
-							material = defaultDrops.get(e.getEntityType()).getType();
-
-							StackedEntityDeathEvent event = new StackedEntityDeathEvent(stackEnt, p, amount, material, xp);
+							StackedEntityDeathEvent event = new StackedEntityDeathEvent(stackEnt, p, amount, getDefaultDrop(e.getEntityType()), xp);
 							SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
 
 							e.setDroppedExp(event.getExpDropped());
 							e.getDrops().clear();
 
-							Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), new ItemStack(event.getMatDropped()));
+							Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), event.getItemDropped());
 							UUID itemId = item.getUniqueId();
 							int stackAmt = event.getAmountDropped();
 							StackedItem sI = new StackedItem(material, stackAmt, item, itemId, System.currentTimeMillis());
@@ -234,64 +231,22 @@ public class SpawnerSpawn implements Listener {
 
 						}
 					}
-//					StackedEntityDeathEvent event = new StackedEntityDeathEvent(stackEnt, p, amount, material, xp);
-//					SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
-//
-//					e.setDroppedExp(event.getExpDropped());
-//					e.getDrops().clear();
-//
-//					Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), new ItemStack(event.getMatDropped()));
-//					UUID itemId = item.getUniqueId();
-//					int stackAmt = event.getAmountDropped();
-//					StackedItem sI = new StackedItem(material, stackAmt, item, itemId, System.currentTimeMillis());
-//					SpaceStacker.instance.getListOfItems().put(itemId, sI);
 
-//					for (int i = event.getAmountDropped(); i > 0; i -= 64) {
-//						if (i > 64) {
-//							e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(),
-//									new ItemStack(event.getMatDropped(), 64));
-//						} else {
-//							e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(),
-//									new ItemStack(event.getMatDropped(), i));
-//							break;
-//						}
-//					}
 					SpaceStacker.instance.getListOfEnt().remove(id);
 				} else {
 
 					SpaceStacker.instance.getListOfEnt().remove(id);
-					StackedEntityDeathEvent event = new StackedEntityDeathEvent(stackEnt, p, amount,
-							stackEnt.getMatToDrop(), xp);
-					die(e, stackEnt, event, stackEnt.getItemStack().getType());
+					StackedEntityDeathEvent event = new StackedEntityDeathEvent(stackEnt, p, amount, stackEnt.getItemStack(), xp);
+					die(e, stackEnt, event);
 
-//					for (int i = event.getAmountDropped(); i > 0; i -= 64) {
-//						if (i > 64) {
-//							mat.setAmount(64);
-//							e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), mat);
-//						} else {
-//							mat.setAmount(i);
-//							e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), mat);
-//							break;
-//						}
-//					}
 				}
 			} else {
 				ItemStack mat = stackEnt.getItemStack();
-				if (mat.getType().equals(Material.AIR)) {
+				if (mat.getType().equals(Material.AIR) || mat.getType().equals(Material.STONE)) {
 					List<ItemStack> isList = e.getDrops();
 					Material material = Material.STONE;
-					int amountItem = 0;
-					if (!isList.isEmpty()) {
-						material = isList.get(0).getType();
-						amountItem = isList.get(0).getAmount();
-						defaultDrops.put(e.getEntityType(), isList.get(0));
-					}
-					if (material.equals(Material.STONE)) {
-						if (defaultDrops.containsKey(e.getEntityType())) {
-							material = defaultDrops.get(e.getEntityType()).getType();
-							amountItem = defaultDrops.get(e.getEntityType()).getAmount();
-						}
-					}
+					int amountItem = ThreadLocalRandom.current().nextInt(multi == 0 ? 1 : multi);
+					ItemStack drop;
 					StackedEntity sE = SpaceStacker.instance.getListOfEnt().get(id);
 					sE.setStackAmount(sE.getStackAmount() - 1);
 					if (sE.getStackAmount() > 0) {
@@ -304,22 +259,51 @@ public class SpawnerSpawn implements Listener {
 					}
 					SpaceStacker.instance.getListOfEnt().remove(id);
 
-					StackedEntityDeathEvent event = new StackedEntityDeathEvent(sE, p, amountItem, material,
-							e.getDroppedExp());
-					SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
 
-					e.setDroppedExp(event.getExpDropped());
-					e.getDrops().clear();
-					// e.getDrops().add(new ItemStack(material, amount));
-					ItemStack isa = new ItemStack(event.getMatDropped(), event.getAmountDropped());
-					isa.setAmount(event.getAmountDropped());
+					if (!isList.isEmpty()) {
+						addDefaultDrop(e.getEntityType(), isList.get(0));
+						int i = 0;
+						for (ItemStack itemStack : isList) {
+							itemStack.setAmount(itemStack.getAmount() + ThreadLocalRandom.current().nextInt(multi == 0 ? 1 : multi));
+							StackedEntityDeathEvent event = new StackedEntityDeathEvent(sE, p, itemStack.getAmount(), itemStack,
+									e.getDroppedExp());
+							SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
 
-					Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), new ItemStack(event.getMatDropped()));
-					UUID itemId = item.getUniqueId();
-					Material material1 = isa.getType();
-					int stackAmt = event.getAmountDropped();
-					StackedItem sI = new StackedItem(material1, stackAmt, item, itemId, System.currentTimeMillis());
-					SpaceStacker.instance.getListOfItems().put(itemId, sI);
+							e.setDroppedExp(event.getExpDropped());
+							// e.getDrops().add(new ItemStack(material, amount));
+							ItemStack isa = event.getItemDropped();
+							isa.setAmount((event.getAmountDropped() == 0) ? 1 : event.getAmountDropped());
+
+							Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), event.getItemDropped());
+							UUID itemId = item.getUniqueId();
+							Material material1 = isa.getType();
+							int stackAmt = event.getAmountDropped();
+							StackedItem sI = new StackedItem(material1, stackAmt, item, itemId, System.currentTimeMillis());
+							SpaceStacker.instance.getListOfItems().put(itemId, sI);
+						}
+						e.getDrops().clear();
+					}
+					else {
+						if (defaultDrops.containsKey(e.getEntityType())) {
+							drop = getDefaultDrop(e.getEntityType());
+							StackedEntityDeathEvent event = new StackedEntityDeathEvent(sE, p, amountItem, drop,
+									e.getDroppedExp());
+							SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
+
+							e.setDroppedExp(event.getExpDropped());
+							// e.getDrops().add(new ItemStack(material, amount));
+							ItemStack isa = event.getItemDropped();
+							isa.setAmount((event.getAmountDropped() == 0) ? 1 : event.getAmountDropped());
+
+							Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), event.getItemDropped());
+							UUID itemId = item.getUniqueId();
+							Material material1 = isa.getType();
+							int stackAmt = event.getAmountDropped();
+							StackedItem sI = new StackedItem(material1, stackAmt, item, itemId, System.currentTimeMillis());
+							SpaceStacker.instance.getListOfItems().put(itemId, sI);
+						}
+					}
+
 
 //					e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), isa);
 //					for (int i = event.getAmountDropped(); i > 0; i -= 64) {
@@ -335,7 +319,6 @@ public class SpawnerSpawn implements Listener {
 				} else {
 					List<ItemStack> isList = e.getDrops();
 					int amountItem = isList.isEmpty() ? 1 : isList.get(0).getAmount();
-
 					StackedEntity sE = SpaceStacker.instance.getListOfEnt().get(id);
 					sE.setStackAmount(sE.getStackAmount() - 1);
 					if (sE.getStackAmount() > 0) {
@@ -343,14 +326,14 @@ public class SpawnerSpawn implements Listener {
 								sE.getBaseEnt().getType());
 						ent.setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
 						SpaceStacker.instance.getListOfEnt().put(ent.getUniqueId(),
-								new StackedEntity(ent, mat, sE.getStackAmount() - 1, ent.getUniqueId()));
+								new StackedEntity(ent, mat, sE.getStackAmount(), ent.getUniqueId()));
 						SpaceStacker.instance.getListOfEnt().get(ent.getUniqueId()).updateName();
 					}
 					SpaceStacker.instance.getListOfEnt().remove(id);
 
-					StackedEntityDeathEvent event = new StackedEntityDeathEvent(sE, p, amountItem, sE.getMatToDrop(),
+					StackedEntityDeathEvent event = new StackedEntityDeathEvent(sE, p, amountItem, sE.getItemStack(),
 							e.getDroppedExp());
-					die(e, sE, event, event.getMatDropped());
+					die(e, sE, event);
 //					for (int i = event.getAmountDropped(); i > 0; i -= 64) {
 //						if (i > 64) {
 //							mat.setAmount(64);
@@ -376,7 +359,7 @@ public class SpawnerSpawn implements Listener {
 		}
 	}
 
-	private void die(EntityDeathEvent e, StackedEntity stackEnt, StackedEntityDeathEvent event, Material type) {
+	private void die(EntityDeathEvent e, StackedEntity stackEnt, StackedEntityDeathEvent event) {
 		SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
 
 		e.getDrops().clear();
@@ -384,9 +367,8 @@ public class SpawnerSpawn implements Listener {
 
 		Item item = e.getEntity().getWorld().dropItemNaturally(e.getEntity().getLocation(), stackEnt.getItemStack());
 		UUID itemId = item.getUniqueId();
-		Material material1 = type;
 		int stackAmt = event.getAmountDropped();
-		StackedItem sI = new StackedItem(material1, stackAmt, item, itemId, System.currentTimeMillis());
+		StackedItem sI = new StackedItem(stackEnt.getItemStack().getType(), stackAmt, item, itemId, System.currentTimeMillis());
 		SpaceStacker.instance.getListOfItems().put(itemId, sI);
 	}
 
@@ -406,5 +388,33 @@ public class SpawnerSpawn implements Listener {
 		return sum;
 	}
 
+
+	public void addDefaultDrop(EntityType entityType, ItemStack itemStack) {
+		if (defaultDrops.containsKey(entityType)) {
+			defaultDrops.get(entityType).add(itemStack);
+		} else {
+			Set<ItemStack> drops = new HashSet<>();
+			drops.add(itemStack);
+			defaultDrops.put(entityType, drops);
+		}
+	}
+
+
+	public ItemStack getDefaultDrop(EntityType entityType) {
+		if (defaultDrops.containsKey(entityType)) {
+			int amt = defaultDrops.get(entityType).size();
+			int rand = ThreadLocalRandom.current().nextInt(amt);
+			int i = 0;
+			for (ItemStack itemStack : defaultDrops.get(entityType)) {
+				if (i == rand) {
+					return itemStack;
+				}
+				i++;
+			}
+
+		}
+
+		return null;
+	}
 
 }

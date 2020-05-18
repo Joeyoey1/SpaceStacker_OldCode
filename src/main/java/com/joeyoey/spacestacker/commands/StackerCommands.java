@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class StackerCommands implements CommandExecutor, TabCompleter {
 
@@ -106,7 +107,12 @@ public class StackerCommands implements CommandExecutor, TabCompleter {
 
 									im.setLore(lore2Add);
 									is.setItemMeta(im);
-									p.getInventory().addItem(is);
+									Map<Integer, ItemStack> leftover = p.getInventory().addItem(is);
+									if (!leftover.isEmpty()) {
+										for (Map.Entry<Integer, ItemStack> entry : leftover.entrySet()) {
+											p.getWorld().dropItemNaturally(p.getLocation(), entry.getValue());
+										}
+									}
 									break;
 								}
 							}
@@ -132,6 +138,12 @@ public class StackerCommands implements CommandExecutor, TabCompleter {
 							im.setLore(lore2Add);
 							is.setItemMeta(im);
 							p.getInventory().addItem(is);
+							Map<Integer, ItemStack> leftover = p.getInventory().addItem(is);
+							if (!leftover.isEmpty()) {
+								for (Map.Entry<Integer, ItemStack> entry : leftover.entrySet()) {
+									p.getWorld().dropItemNaturally(p.getLocation(), entry.getValue());
+								}
+							}
 						}
 						return false;
 					} else {

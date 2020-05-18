@@ -1,9 +1,15 @@
 package com.joeyoey.spacestacker;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.joeyoey.spacestacker.commands.StackerCommands;
 import com.joeyoey.spacestacker.listeners.*;
 import com.joeyoey.spacestacker.objects.*;
+import com.joeyoey.spacestacker.storage.EntityTypeAdapter;
+import com.joeyoey.spacestacker.storage.ItemStackAdapter;
+import com.joeyoey.spacestacker.storage.MaterialAdapter;
 import com.joeyoey.spacestacker.util.MessageFactory;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -25,10 +31,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 public class SpaceStacker extends JavaPlugin {
@@ -37,13 +46,18 @@ public class SpaceStacker extends JavaPlugin {
     Statics
      */
     public static SpaceStacker instance;
+    public static Gson gson;
+    public static SpaceStackerApi spaceStackerApi;
 
     /*
     Settings
      */
     public boolean debug;
+    private boolean adaptive;
     private boolean hoverUpgrade;
     private boolean itemStack;
+    private boolean nerfMobs;
+    private boolean entMerger;
 
     private int saveFrequency;
     private int holoViewDist;
@@ -61,14 +75,14 @@ public class SpaceStacker extends JavaPlugin {
     private Set<SpawnReason> reasons = new HashSet<>();
 
     private Map<EntityType, List<UpgradeContainer>> entityUpgrades = new HashMap<>();
-    private Map<UUID, Material> mobDrops = new HashMap<>();
+    private Map<UUID, List<Material>> mobDrops = new HashMap<>();
 
     /*
     Runtime variables
      */
 
     private Map<JoLocation, StackedSpawner> stackedSpawners = new HashMap<>();
-    private Map<UUID, StackedEntity> listOfEnt = new HashMap<>();
+    private Map<UUID, StackedEntity> listOfEnt = new ConcurrentHashMap<>();
     private Map<Player, InventoryCheck> pBound = new HashMap<>();
     private Map<UUID, Inventory> openInv = new HashMap<>();
     private Map<UUID, StackedItem> listOfItems = new ConcurrentHashMap<>();
@@ -83,11 +97,23 @@ public class SpaceStacker extends JavaPlugin {
     private FileConfiguration playerBalanceConfig;
 
     private BukkitTask itemTask;
+    private BukkitTask entityTask;
 
     private int times;
 
 
     public void onEnable() {
+        gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .serializeNulls()
+                .registerTypeAdapter(EntityType.class, new EntityTypeAdapter())
+                .registerTypeAdapter(ItemStack.class, new ItemStackAdapter())
+                .registerTypeAdapter(Material.class, new MaterialAdapter())
+                .enableComplexMapKeySerialization()
+                .create();
+
+        spaceStackerApi = new SpaceStackerApi(this);
+
         debug = false;
         instance = this;
         times = 0;
@@ -187,6 +213,37 @@ public class SpaceStacker extends JavaPlugin {
                 }
             }
         }.runTaskTimerAsynchronously(this, 0, 20);
+
+        if (entMerger) {
+            entityTask = new BukkitRunnable() {
+                @Override
+                public void run() {
+//                listOfItems.putAll(toADD);
+//                toADD.clear();
+                    try {
+                        for (Iterator<StackedEntity> entity = listOfEnt.values().iterator(); entity.hasNext(); ) {
+                            StackedEntity stackedEntity = entity.next();
+                            if (stackedEntity.getBaseEnt().getLocation().getY() < 0) {
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        stackedEntity.getBaseEnt().remove();
+                                    }
+                                }.runTask(SpaceStacker.instance);
+                                entity.remove();
+                                continue;
+                            }
+                            if (!stackedEntity.getBaseEnt().isValid() || tryAll(stackedEntity)) {
+                                entity.remove();
+                            }
+                        }
+                        //listOfItems.values().removeIf(aa -> !aa.getItem().isValid() || tryAll(aa));
+                    } catch (NullPointerException ignored) {
+                    }
+                }
+            }.runTaskTimerAsynchronously(this, 0, 100);
+        }
+
     }
 
     public void onDisable() {
@@ -202,12 +259,40 @@ public class SpaceStacker extends JavaPlugin {
         for (StackedItem items : listOfItems.values()) {
             items.getItem().remove();
         }
+        try {
+            FileWriter fileWriter = new FileWriter(this.getDataFolder().getAbsolutePath() + "/loottables.json");
+            gson.toJson(SpawnerSpawn.defaultDrops, new TypeToken<Map<EntityType, Set<ItemStack>>>(){}.getType(), fileWriter);
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.getLogger().log(Level.INFO, "Looks like there was an issue saving loot tables");
+        }
         getLogger().log(Level.INFO, ChatColor.DARK_PURPLE + "Saving Spawner data");
         saveData();
         getLogger().log(Level.INFO, ChatColor.LIGHT_PURPLE + "Spawner data saved!");
     }
 
     public void loadData() {
+
+        if (this.adaptive) {
+            try {
+                File loottable = new File(this.getDataFolder().getAbsolutePath() + "/loottables.json");
+                loottable.createNewFile();
+
+
+                SpawnerSpawn.defaultDrops = gson.fromJson(new FileReader(loottable), new TypeToken<Map<EntityType, Set<ItemStack>>>() {
+                }.getType());
+                if (SpawnerSpawn.defaultDrops == null) {
+                    SpawnerSpawn.defaultDrops = new HashMap<>();
+                }
+            } catch (Exception e) {
+                getLogger().log(Level.INFO, "No basic loot table data yet!");
+                SpawnerSpawn.defaultDrops = new HashMap<>();
+            }
+        }
+
+
         new BukkitRunnable() {
 
             @Override
@@ -263,6 +348,9 @@ public class SpaceStacker extends JavaPlugin {
     }
 
     public void loadSettings() {
+        adaptive = getConfig().getBoolean("settings.adaptive");
+        nerfMobs = getConfig().getBoolean("settings.nerf-mobs");
+        entMerger = getConfig().getBoolean("settings.entity-merger-task");
         maxSpawnerStack = getConfig().getInt("settings.max-spawner-stack");
         maxItemStack = getConfig().getInt("settings.max-item-stack");
         maxEntityStack = getConfig().getInt("settings.max-entity-stack");
@@ -301,6 +389,7 @@ public class SpaceStacker extends JavaPlugin {
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
             this.getLogger().log(Level.INFO, "Looks like you havent placed any spawners yet! Enjoy the plugin.");
         }
+
         for (StackedSpawner spawner : stackedSpawners.values()) {
 
             getPBConfig().set("Spawners." + spawner.getjLoc().toString() + ".stackAmount", spawner.getStackAmount());
@@ -344,7 +433,7 @@ public class SpaceStacker extends JavaPlugin {
         return entityUpgrades;
     }
 
-    public Map<UUID, Material> getMobDrops() {
+    public Map<UUID, List<Material>> getMobDrops() {
         return mobDrops;
     }
 
@@ -402,6 +491,10 @@ public class SpaceStacker extends JavaPlugin {
 
     public boolean isHoverUpgrade() {
         return hoverUpgrade;
+    }
+
+    public boolean isNerfMobs() {
+        return nerfMobs;
     }
 
     public Set<SpawnReason> getReasons() {
@@ -576,9 +669,47 @@ public class SpaceStacker extends JavaPlugin {
     }
 
     public boolean tryAll(StackedItem aa) {
-        for (StackedItem next : SpaceStacker.instance.getListOfItems().values()) {
-            if (aa.tryStack(next)) {
-                return true;
+        if (Bukkit.getBukkitVersion().contains("1.15")) {
+            try {
+                return Bukkit.getScheduler().callSyncMethod(this, () -> {
+                    for (StackedItem next : SpaceStacker.instance.getListOfItems().values()) {
+                        if (aa.tryStack(next)) {
+                            return true;
+                        }
+                    } return false;
+                }).get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        } else {
+            for (StackedItem next : SpaceStacker.instance.getListOfItems().values()) {
+                if (aa.tryStack(next)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean tryAll(StackedEntity aa) {
+        if (Bukkit.getBukkitVersion().contains("1.15")) {
+            try {
+                return Bukkit.getScheduler().callSyncMethod(this, () -> {
+                   for (StackedEntity next : SpaceStacker.instance.getListOfEnt().values()) {
+                       if (aa.tryStack(next)) {
+                           return true;
+                       }
+                   }
+                   return false;
+               }).get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        } else {
+            for (StackedEntity next : SpaceStacker.instance.getListOfEnt().values()) {
+                if (aa.tryStack(next)) {
+                    return true;
+                }
             }
         }
         return false;

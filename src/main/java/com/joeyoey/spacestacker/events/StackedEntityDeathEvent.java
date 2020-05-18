@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 
 public class StackedEntityDeathEvent extends Event implements Cancellable {
 
@@ -14,14 +15,14 @@ public class StackedEntityDeathEvent extends Event implements Cancellable {
 	private StackedEntity dead;
 	private Player killer;
 	private int amountDropped;
-	private Material matDropped;
+	private ItemStack itemDropped;
 	private int expDropped;
 
-	public StackedEntityDeathEvent(StackedEntity dead, Player killer, int amountDropped, Material matDropped, int expDropped) {
+	public StackedEntityDeathEvent(StackedEntity dead, Player killer, int amountDropped, ItemStack itemDropped, int expDropped) {
 		this.dead = dead;
 		this.killer = killer;
 		this.amountDropped = amountDropped;
-		this.matDropped = matDropped;
+		this.itemDropped = itemDropped;
 		this.expDropped = expDropped;
 	}
 
@@ -52,14 +53,6 @@ public class StackedEntityDeathEvent extends Event implements Cancellable {
 		this.amountDropped = amountDropped;
 	}
 
-	public Material getMatDropped() {
-		return matDropped;
-	}
-
-	public void setMatDropped(Material matDropped) {
-		this.matDropped = matDropped;
-	}
-
 	public int getExpDropped() {
 		return expDropped;
 	}
@@ -76,4 +69,11 @@ public class StackedEntityDeathEvent extends Event implements Cancellable {
 		return killer;
 	}
 
+	public ItemStack getItemDropped() {
+		return itemDropped;
+	}
+
+	public void setItemDropped(ItemStack itemDropped) {
+		this.itemDropped = itemDropped;
+	}
 }

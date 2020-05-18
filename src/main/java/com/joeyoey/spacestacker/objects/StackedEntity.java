@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.UUID;
 
@@ -143,7 +144,6 @@ public class StackedEntity {
 		if (this.canStackWith(a)) {
 			int total = this.getStackAmount();
 			total += a.getStackAmount();
-
 			StackedEntityMergeEvent event = new StackedEntityMergeEvent(this, a);
 
 			SpaceStacker.instance.getServer().getPluginManager().callEvent(event);
@@ -162,6 +162,7 @@ public class StackedEntity {
 				this.baseEnt.remove();
 				a.setStackAmount(total);
 				a.updateName();
+				a.baseEnt.setMetadata("STACKED", new FixedMetadataValue(SpaceStacker.instance, true));
 				SpaceStacker.instance.getListOfEnt().remove(this.id);
 				SpaceStacker.instance.getListOfEnt().put(a.getId(), a);
 				return true;

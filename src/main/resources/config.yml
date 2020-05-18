@@ -17,7 +17,9 @@
 #################################
 # SpaceStacker by Joeyoey <3
 settings:
+  adaptive: true # if set to true this automatically creates default drop tables for mobs, if false then you can customize them in loottable.json
   debug: false
+  entity-merger-task: false # Experimental feature use at your own risk may lose some mobs sometimes.
   ASkyblock: false
   inv-name: '&b%entity% Upgrade Spawner'
   inv-size: 27 # must be multiple of 9 up to a maximum of 54
@@ -43,11 +45,11 @@ settings:
   - 'ENTITY_ATTACK'
   max-spawner-stack: 10000
   max-item-stack: 10000
-  max-entity-stack: 10000 # There is a hard cap at 10,000 as drop calculation is rough past that... This will be fixed in the future.
+  max-entity-stack: 10000
   
   itemstack-mode: false # This enables a mode of which upgrades will be gotten as an itemstack which includes lore name and data, if this is enabled and any of those are missing the plugin will shutdown.
   
-  nerf-mobs: true
+  nerf-mobs: true # This makes it so mobs that are "stacked" do not target players.
   
   stack-reasons: # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html detailed list of spawn reasons
   - NATURAL

@@ -101,6 +101,7 @@ public class StackedItem {
 		if (itemStack == null)
 			return false;
 		final String typeNameString = itemStack.getType().name();
+
 		return typeNameString.endsWith("_HELMET")
 				|| typeNameString.endsWith("_CHESTPLATE")
 				|| typeNameString.endsWith("_LEGGINGS")
@@ -108,6 +109,7 @@ public class StackedItem {
 				|| typeNameString.endsWith("SWORD")
 				|| typeNameString.endsWith("PICKAXE")
 				|| typeNameString.endsWith("SHOVEL")
+				|| typeNameString.contains("POTION")
 				|| typeNameString.endsWith("HOE");
 	}
 

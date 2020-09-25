@@ -81,7 +81,7 @@ public class SpaceStacker extends JavaPlugin {
     Runtime variables
      */
 
-    private Map<JoLocation, StackedSpawner> stackedSpawners = new HashMap<>();
+    private Map<JoLocation, StackedSpawner> stackedSpawners = new ConcurrentHashMap<>();
     private Map<UUID, StackedEntity> listOfEnt = new ConcurrentHashMap<>();
     private Map<Player, InventoryCheck> pBound = new HashMap<>();
     private Map<UUID, Inventory> openInv = new HashMap<>();
@@ -656,16 +656,29 @@ public class SpaceStacker extends JavaPlugin {
 
     public void check() {
         Set<JoLocation> removal = new HashSet<>();
-        this.getStackedSpawners().forEach((k, v) -> {
-            if (k.getBlock().getBlock().getType() != Material.valueOf("MOB_SPAWNER")) {
-                visibility.remove(v.getHolo());
+        int i = 0;
+        int j = 1;
+        for (Map.Entry<JoLocation, StackedSpawner> entry : this.getStackedSpawners().entrySet()) {
+            Bukkit.getScheduler().runTaskLater(this, () -> {
+                if (entry.getKey().getBlock().getChunk().isLoaded()) {
+                    if (entry.getKey().getBlock().getBlock().getType() != Material.valueOf("MOB_SPAWNER")) {
+                        visibility.remove(entry.getValue().getHolo());
 
-                v.getHolo().delete();
-                removal.add(k);
+                        entry.getValue().getHolo().delete();
+                        removal.add(entry.getKey());
+                    }
+                }
+            }, j);
+            i++;
+            if (i > 20) {
+                i = 0;
+                j += 5;
+                if (j > 2000000000) {
+                    j = 1;
+                }
             }
-            k.getBlock().getChunk().unload();
-        });
-        removal.forEach(jLoc -> getStackedSpawners().remove(jLoc));
+        }
+        Bukkit.getScheduler().runTaskLater(this, () -> getStackedSpawners().entrySet().removeIf(entry -> removal.contains(entry.getKey())), j + 5);
     }
 
     public boolean tryAll(StackedItem aa) {

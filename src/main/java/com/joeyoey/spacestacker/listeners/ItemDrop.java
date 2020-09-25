@@ -58,14 +58,14 @@ public class ItemDrop implements Listener {
                 }
             }
 
-            if (pickedUp) {
-                for (Sound sound : Sound.values()) {
-                    if (sound.name().contains("PICKUP")) {
-                        e.getPlayer().playSound(e.getPlayer().getLocation(), sound, 1, 0);
-                        break;
-                    }
-                }
-            }
+//            if (pickedUp) {
+//                for (Sound sound : Sound.values()) {
+//                    if (sound.name().contains("PICKUP")) {
+//                        e.getPlayer().playSound(e.getPlayer().getLocation(), sound, 1, 0);
+//                        break;
+//                    }
+//                }
+//            }
         }
     }
 

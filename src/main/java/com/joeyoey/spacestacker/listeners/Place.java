@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -203,7 +204,9 @@ public class Place implements Listener {
                     spawner.getjLoc().getBlock().getWorld().getNearbyEntities(spawner.getjLoc().getBlock(), 5, 5, 5).forEach(entity -> {
                         if (entity instanceof Player) {
                             Player play = (Player) entity;
-                            play.closeInventory();
+                            if (play.getOpenInventory().getType() != InventoryType.CRAFTING) {
+                                play.closeInventory();
+                            }
                         }
                     });
                     StackedSpawner finalSpawner = spawner;

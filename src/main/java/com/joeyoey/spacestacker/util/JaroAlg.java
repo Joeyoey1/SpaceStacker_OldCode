@@ -53,6 +53,7 @@ public class JaroAlg {
 
 	// Applies the other two formulas and gets an output percentage
 	public static double getJaroWinkler(String a, String b) {
+		if (a.equals(b)) return 100.0;
 		double out;
 
 		double m = getMatchingChars(a, b);

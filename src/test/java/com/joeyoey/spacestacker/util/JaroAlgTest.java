@@ -9,6 +9,7 @@ class JaroAlgTest {
     @Test
     void exactMatchShouldHaveHighScore() {
         double score = JaroAlg.getJaroWinkler("zombie", "zombie");
+        System.out.println("Score: " + score);
         assertTrue(score >= 99.0);
     }
 }

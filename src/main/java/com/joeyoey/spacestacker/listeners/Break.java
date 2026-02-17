@@ -43,7 +43,7 @@ public class Break implements Listener {
 			}
 			return;
 		}
-		if (e.getBlock().getType().equals(Material.valueOf("MOB_SPAWNER"))) {
+		if (e.getBlock().getType().equals(Material.valueOf("SPAWNER"))) {
 			debug += "2";
 
 			JoLocation jLoc = new JoLocation(e.getBlock().getLocation());
@@ -85,7 +85,7 @@ public class Break implements Listener {
 						custom.getHolo().delete();
 						
 						jLoc.getBlock().getBlock().setType(Material.AIR);
-						ItemStack is = new ItemStack(Material.valueOf("MOB_SPAWNER"));
+						ItemStack is = new ItemStack(Material.valueOf("SPAWNER"));
 						ItemMeta bMeta = is.getItemMeta();
 //						CreatureSpawner cs = (CreatureSpawner) bMeta.getBlockState();
 //						cs.setSpawnedType(eType);
@@ -116,7 +116,7 @@ public class Break implements Listener {
 						
 						custom.setStackAmount(amount - 1);
 						custom.updateHolo();
-						ItemStack is = new ItemStack(Material.valueOf("MOB_SPAWNER"));
+						ItemStack is = new ItemStack(Material.valueOf("SPAWNER"));
 						ItemMeta bMeta = is.getItemMeta();
 //						CreatureSpawner cs = (CreatureSpawner) bMeta.getBlockState();
 //						cs.setSpawnedType(eType);
@@ -158,7 +158,7 @@ public class Break implements Listener {
 					EntityType eType = cspawn.getSpawnedType();
 					int amount = 1;
 
-					ItemStack is = new ItemStack(Material.valueOf("MOB_SPAWNER"));
+					ItemStack is = new ItemStack(Material.valueOf("SPAWNER"));
 					ItemMeta bMeta = is.getItemMeta();
 //				CreatureSpawner cs = (CreatureSpawner) bMeta.getBlockState();
 //				cs.setSpawnedType(eType);

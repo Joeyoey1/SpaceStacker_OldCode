@@ -73,7 +73,7 @@ public class StackerCommands implements CommandExecutor, TabCompleter {
 						if (plugin.getEntityUpgrades().containsKey(eType)) {
 							for (UpgradeContainer upContain : plugin.getEntityUpgrades().get(eType)) {
 								if (upContain.getItemStack().getType() == mat || mat.equals(Material.AIR)) {
-									ItemStack is = new ItemStack(Material.valueOf("MOB_SPAWNER"));
+									ItemStack is = new ItemStack(Material.valueOf("SPAWNER"));
 									ItemMeta im = is.getItemMeta();
 									String name = plugin.getConfig().getString("formats.tier-spawner.name");
 									List<String> lore = plugin.getConfig().getStringList("formats.tier-spawner.lore");
@@ -117,7 +117,7 @@ public class StackerCommands implements CommandExecutor, TabCompleter {
 								}
 							}
 						} else {
-							ItemStack is = new ItemStack(Material.valueOf("MOB_SPAWNER"));
+							ItemStack is = new ItemStack(Material.valueOf("SPAWNER"));
 							ItemMeta im = is.getItemMeta();
 						
 							String name = plugin.getConfig().getString("formats.tier-spawner.name");

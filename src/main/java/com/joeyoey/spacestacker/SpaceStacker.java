@@ -661,7 +661,7 @@ public class SpaceStacker extends JavaPlugin {
         for (Map.Entry<JoLocation, StackedSpawner> entry : this.getStackedSpawners().entrySet()) {
             Bukkit.getScheduler().runTaskLater(this, () -> {
                 if (entry.getKey().getBlock().getChunk().isLoaded()) {
-                    if (entry.getKey().getBlock().getBlock().getType() != Material.valueOf("MOB_SPAWNER")) {
+                    if (entry.getKey().getBlock().getBlock().getType() != Material.valueOf("SPAWNER")) {
                         visibility.remove(entry.getValue().getHolo());
 
                         entry.getValue().getHolo().delete();

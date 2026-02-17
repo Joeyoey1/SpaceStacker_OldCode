@@ -88,7 +88,7 @@ public class Place implements Listener {
             }
             return;
         }
-        if (e.getBlock().getType().equals(Material.valueOf("MOB_SPAWNER"))) {
+        if (e.getBlock().getType().equals(Material.valueOf("SPAWNER"))) {
             JoLocation jLoc = new JoLocation(e.getBlock().getLocation());
 //            if (SpaceStacker.instance.getConfig().getBoolean("settings.ASkyblock") && ASkyBlockAPI.getInstance().playerIsOnIsland(e.getPlayer())) {
 //                Island island = ASkyBlockAPI.getInstance().getIslandAt(e.getBlock().getLocation());

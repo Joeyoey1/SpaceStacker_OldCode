@@ -52,7 +52,7 @@ public class Interact implements Listener {
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
 		if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && !e.getPlayer().isSneaking()) {
-			if (e.getClickedBlock().getType().equals(Material.valueOf("MOB_SPAWNER"))) {
+			if (e.getClickedBlock().getType().equals(Material.valueOf("SPAWNER"))) {
 				JoLocation jLoc = new JoLocation(e.getClickedBlock().getLocation());
 				CreatureSpawner cs = (CreatureSpawner) e.getClickedBlock().getState();
 				if (SpaceStacker.instance.getStackedSpawners().containsKey(jLoc)) {

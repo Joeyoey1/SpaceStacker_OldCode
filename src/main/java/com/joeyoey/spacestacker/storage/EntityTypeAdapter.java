@@ -29,7 +29,7 @@ public class EntityTypeAdapter implements JsonDeserializer<EntityType>, JsonSeri
             EntityType entityType = EntityType.valueOf(jsonObject.get("entity-type").getAsString());
             return entityType;
         } catch (Exception e) {
-            return EntityType.PIG_ZOMBIE;
+            return EntityType.ZOMBIFIED_PIGLIN;
         }
     }
 
